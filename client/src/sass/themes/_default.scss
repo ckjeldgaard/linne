@@ -29,4 +29,7 @@ body {
 
 article {
   padding: $space-med;
+  @include media(medium) {
+    padding-bottom: 80px;
+  }
 }
