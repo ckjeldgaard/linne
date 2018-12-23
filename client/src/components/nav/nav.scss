@@ -1,0 +1,56 @@
+$iconsize: 25px;
+
+nav {
+  background-color: $brand-color;
+  color: $paper;
+  font-size: $font-med;
+  ul {
+    max-width: #{map-get($breakpoints, 'small')};
+    display: flex;
+    justify-content: space-evenly;
+    width: 100%;
+    margin: 0 auto;
+    padding: 0;
+    li {
+      display: block;
+      flex-grow: 1;
+      flex-basis: 0;
+      list-style-type: none;
+    }
+  }
+  a {
+    background-size: $iconsize $iconsize;
+    background-repeat: no-repeat;
+    background-position: center 10px;
+    color: $paper;
+    padding: $iconsize + 20 20px 10px 20px;
+    display: block;
+    text-align: center;
+    text-decoration: none;
+    &:visited, &:active, &:link {
+      color: $paper;
+      text-decoration: none;
+    }
+    &:hover {
+      background-color: $midnight-blue;
+      text-decoration: none;
+    }
+    &.detect {
+      background-image: image('menu_icon_detect.svg');
+    }
+    &.upload {
+      background-image: image('menu_icon_upload.svg');
+    }
+    &.stats {
+      background-image: image('menu_icon_stats.svg');
+    }
+    &.user {
+      background-image: image('menu_icon_user.svg');
+    }
+  }
+  @include media(medium) {
+    position: fixed;
+    bottom: 0;
+    width: 100%;
+  }
+}

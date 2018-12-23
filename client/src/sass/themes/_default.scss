@@ -1,0 +1,32 @@
+// -----------------------------------------------------------------------------
+// When having several themes, this file contains everything related to the
+// default one.
+// -----------------------------------------------------------------------------
+
+html,
+body {
+  height: 100%;
+  @include media(medium) {
+    background-color: $paper;
+  }
+}
+
+body {
+  display: flex;
+  flex-wrap: wrap;
+  line-height: 1;
+}
+
+#root {
+  width: #{map-get($breakpoints, 'medium')};
+  margin: auto;
+  @include media(medium) {
+    padding-top: $space-big;
+    width: 100%;
+    margin: 0;
+  }
+}
+
+article {
+  padding: $space-med;
+}

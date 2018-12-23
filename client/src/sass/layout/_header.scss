@@ -1,0 +1,29 @@
+// -----------------------------------------------------------------------------
+// This file contains all styles related to the header of the site/application.
+// -----------------------------------------------------------------------------
+
+header {
+  background-color: $brand-color;
+  color: $off-white;
+  padding: $space-small $space-med;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  h1 {
+    background-image: image('coins.svg');
+    background-repeat: no-repeat;
+    background-size: 22px 22px;
+    padding-left: $space-big;
+    color: $off-white;
+    font-size: $font-big;
+    font-weight: bold;
+    margin: 0;
+    flex-grow: 2;
+  }
+  @include media(medium) {
+    position:fixed;
+    top: 0;
+    z-index: 2;
+    width: 100%;
+  }
+}

@@ -1,0 +1,10 @@
+.app {
+  margin: $space-big 0;
+  background-color: $paper;
+  box-shadow: $space-tiny $space-tiny $space-small $silver;
+  @include media(medium) {
+    margin: 0;
+    border: none;
+    box-shadow: none;
+  }
+}
