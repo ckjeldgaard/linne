@@ -31,7 +31,7 @@ nav {
       color: $paper;
       text-decoration: none;
     }
-    &:hover {
+    &:hover, &.active {
       background-color: $midnight-blue;
       text-decoration: none;
     }

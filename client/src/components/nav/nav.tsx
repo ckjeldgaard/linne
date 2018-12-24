@@ -1,17 +1,28 @@
 import * as React from "react";
 import {ReactNode} from "react";
+import {MenuItem} from "../../model/menuitem";
+import {Link, Route} from "react-router-dom";
 
-export default class Nav extends React.Component {
+export interface NavProps {
+    menuItems: MenuItem[];
+}
+
+export default class Nav extends React.Component<NavProps> {
 
     render(): ReactNode {
         return <nav>
             <ul>
-                <li><a className="detect" href="#">Detect</a></li>
-                <li><a className="upload" href="#">Upload</a></li>
-                <li><a className="stats" href="#">Stats</a></li>
-                <li><a className="user" href="#">User</a></li>
+                <Route render={(props) => {
+                    console.log("path", props.location.pathname);
+                    return this.props.menuItems.map((item) => {
+                        const active = (props.location.pathname === item.path) ? "active" : "";
+                        // const classes = `${item.className} ${active}`;
+                        return <li key={item.className}>
+                            <Link to={item.path} className={`${item.className} ${active}`}>{item.label}</Link>
+                        </li>;
+                    });
+                }} />
             </ul>
         </nav>;
     }
-
 }

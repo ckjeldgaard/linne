@@ -2,14 +2,17 @@ import * as React from "react";
 import {render} from "react-dom";
 import {AppContainer} from "react-hot-loader";
 import App from "./components/App";
+import { HashRouter } from "react-router-dom";
 import "./sass/main.scss";
 
 const rootEl = document.getElementById("root");
 
 render(
-    <AppContainer>
-        <App/>
-    </AppContainer>,
+    <HashRouter>
+        <AppContainer>
+            <App/>
+        </AppContainer>
+    </HashRouter>,
     rootEl
 );
 
@@ -21,9 +24,11 @@ if (module.hot) {
         const NewApp = require("./components/App").default;
 
         render(
-            <AppContainer>
-                <NewApp/>
-            </AppContainer>,
+            <HashRouter>
+                <AppContainer>
+                    <NewApp/>
+                </AppContainer>
+            </HashRouter>,
             rootEl
         );
     });
