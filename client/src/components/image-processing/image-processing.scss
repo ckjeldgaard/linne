@@ -1,5 +1,26 @@
 .image-processing {
+  position: relative;
+  height: 100%;
   img {
     width: 100%;
+  }
+  .controls {
+    position: absolute;
+    bottom: $space-med;
+    width: 100%;
+    button {
+      width: 100%
+    }
+    .classify {
+      display: flex;
+      margin-bottom: $space-med;
+      label {
+        padding-right: $space-med;
+        flex-grow: 1;
+        select {
+          width: 100%;
+        }
+      }
+    }
   }
 }

@@ -13,7 +13,6 @@ export default class Nav extends React.Component<NavProps> {
         return <nav>
             <ul>
                 <Route render={(props) => {
-                    console.log("path", props.location.pathname);
                     return this.props.menuItems.map((item) => {
                         const active = (props.location.pathname === item.path) ? "active" : "";
                         // const classes = `${item.className} ${active}`;

@@ -1,3 +1,20 @@
 // -----------------------------------------------------------------------------
 // This file contains all styles related to the button component.
 // -----------------------------------------------------------------------------
+
+button {
+  background-color: $brand-color;
+  border: none;
+  color: $paper;
+  padding: $space-small $space-med;
+  text-align: center;
+  text-decoration: none;
+  display: inline-block;
+  font-size: $font-big;
+  border-radius: 5px;
+
+  &:disabled,
+  &[disabled]{
+    background-color: $mid-grey;
+  }
+}

@@ -31,6 +31,8 @@
 '../components/upload/upload',
 '../components/image-processing/image-processing';
 
+@import '../../node_modules/croppie/croppie.css';
+
 // 6. Page-specific styles
 @import
 'pages/home';
