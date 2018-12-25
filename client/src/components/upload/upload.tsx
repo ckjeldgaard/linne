@@ -1,28 +1,48 @@
 import * as React from "react";
 import {ReactNode} from "react";
+import * as ReactModal from "react-modal";
+import ImageProcessing from "../image-processing/ImageProcessing";
 
-export default class Upload extends React.Component {
+export interface UploadState {
+    chosenFile: Blob | null;
+}
 
-    private _fileField: any;
-    private _previewField: any;
-    private fileReader = new FileReader();
+ReactModal.setAppElement("#root");
 
-    constructor() {
-        super({});
+export default class Upload extends React.Component<{}, UploadState> {
+
+    private fileField: any;
+
+    constructor(props: any, state: UploadState) {
+        super(props, state);
         this.onFileChosen = this.onFileChosen.bind(this);
+
+        this.state = {
+            chosenFile: null
+        };
+
+        this.closeModal = this.closeModal.bind(this);
+    }
+
+    closeModal(): void {
+        this.setState({chosenFile: null});
     }
 
     private onFileChosen(event: any): void {
-        this.fileReader.readAsDataURL(this._fileField.files[0]);
-        this.fileReader.onload = (ev) => {
-            this._previewField.src = (ev.target as FileReader).result;
-        };
+        this.setState({chosenFile: this.fileField.files[0]});
     }
 
     render(): ReactNode {
         return <article className="upload">
-            <input type="file" accept="image/*" capture ref={(f) => {this._fileField = f; }} onChange={this.onFileChosen} />
-            <img ref={(p) => {this._previewField = p; }} alt="Preview" />
+            <input type="file" accept="image/*" capture ref={(f) => {this.fileField = f; }} onChange={this.onFileChosen} />
+            <ReactModal
+                isOpen={this.state.chosenFile != null}
+                onRequestClose={this.closeModal}
+                className="modal"
+                overlayClassName="overlay">
+                <span className="close" onClick={this.closeModal}>×</span>
+                {this.state.chosenFile != null && <ImageProcessing file={this.state.chosenFile} />}
+            </ReactModal>
         </article>;
     }
 

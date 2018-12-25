@@ -1,5 +1,40 @@
-.upload {
-  img {
-    width: 100%;
+.modal {
+  position: absolute;
+  top: $space-big;
+  left: $space-big;
+  right: $space-big;
+  bottom: $space-big;
+  background-color: $paper;
+  padding: $space-med;
+  &:focus{
+    outline: none;
   }
+}
+
+.overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 3;
+  background-color: rgba(0,0,0,0.4); /* Black w/ opacity */
+}
+
+.close {
+  color: $dark-grey;
+  // float: right;
+  font-size: $font-huge;
+  font-weight: bold;
+  display: block;
+  position: absolute;
+  top: $space-small;
+  right: $space-med;
+}
+
+.close:hover,
+.close:focus {
+  color: black;
+  text-decoration: none;
+  cursor: pointer;
 }
