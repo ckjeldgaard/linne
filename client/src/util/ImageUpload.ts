@@ -11,6 +11,7 @@ import {ContrastPhoto} from "./ContrastPhoto";
 import {BrightenPhoto} from "./BrightenPhoto";
 import {CroppedPhoto} from "./CroppedPhoto";
 import {ClassifiedCoin} from "../model/classified-coin";
+import {RotatePhoto} from "./RotatePhoto";
 
 const uuidv1 = require("uuid/v1");
 
@@ -43,17 +44,18 @@ export class ImageUpload {
 
         const imageData = await photo.draw();
 
-        // Upload 3 additional versions of the image rotated 90 degrees each:
-        for (let i = 90; i < 360; i += 90) {
-            console.log("i degrees = ", i);
-        }
-
-
-        this.uploadOriginal((snapshot: UploadTaskSnapshot, downloadUrl: string) => {
+        this.uploadOriginal(async (snapshot: UploadTaskSnapshot, downloadUrl: string) => {
 
             const coin = new ClassifiedCoin(snapshot.metadata.name, downloadUrl, this.chosenCoin.id, this.chosenSide, 0, imageData);
-            console.log("coin = ", coin);
+            console.log("coin = ", coin.toObject());
             this.writeCoinToDatabase(coin);
+
+            // Upload 3 additional versions of the image rotated 90 degrees each:
+            for (let i = 90; i < 360; i += 90) {
+                const rotatedImage = await new RotatePhoto(photo, i).draw();
+                const coin = new ClassifiedCoin(snapshot.metadata.name, downloadUrl, this.chosenCoin.id, this.chosenSide, i, rotatedImage);
+                this.writeCoinToDatabase(coin);
+            }
 
             console.log("Successfully uploaded!", snapshot);
         });
