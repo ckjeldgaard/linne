@@ -1,3 +1,44 @@
+$camera-icon-size: 96px;
+
+.upload {
+  .captureInput {
+    width: 0.1px;
+    height: 0.1px;
+    opacity: 0;
+    overflow: hidden;
+    position: absolute;
+    z-index: -1;
+  }
+  label {
+    padding: ($camera-icon-size + 15px) 25px 15px 25px;
+    font-size: 24px;
+    text-align: center;
+    cursor: pointer;
+    outline: none;
+    color: $paper;
+    background-color: $carrot;
+    border: none;
+    border-radius: 15px;
+    box-shadow: 0 9px $mid-grey;
+    margin: $space-big auto;
+    background-image: image('image_plus.svg');
+    background-repeat: no-repeat;
+    background-position: center 5px;
+    background-size: $camera-icon-size $camera-icon-size;
+    display: block;
+    width: 270px;
+    font-weight: bold;
+  }
+
+  label:hover {background-color: $pumpkin}
+
+  label:active {
+    background-color: $pumpkin;
+    box-shadow: 0 5px $dark-grey;
+    transform: translateY(4px);
+  }
+}
+
 .modal {
   position: absolute;
   top: $space-big;

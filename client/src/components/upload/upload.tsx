@@ -43,7 +43,8 @@ export default class Upload extends React.Component<{}, UploadState> {
 
     render(): ReactNode {
         return <article className="upload">
-            <input type="file" accept="image/*" capture ref={(f) => {this.fileField = f; }} onChange={this.onFileChosen} />
+            <input type="file" accept="image/*" id="capture" className="captureInput" capture ref={(f) => {this.fileField = f; }} onChange={this.onFileChosen} />
+            <label htmlFor="capture" id="capture-label">Upload new image</label>
             <ReactModal
                 isOpen={this.state.chosenFile != null}
                 onRequestClose={this.closeModal}
