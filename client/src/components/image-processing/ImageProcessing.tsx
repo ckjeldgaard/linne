@@ -54,7 +54,7 @@ export default class ImageProcessing extends React.Component<ImageProcessingProp
     private setCropper(): void {
         const options: CroppieOptions = {
             viewport: { width: this.imageWidth, height: this.imageHeight, type: "circle" },
-            boundary: { width: 300, height: 300 },
+            boundary: { width: 280, height: 280 },
             showZoomer: true,
             enableOrientation: true
         };

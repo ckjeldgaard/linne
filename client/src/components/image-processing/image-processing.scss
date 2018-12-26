@@ -1,13 +1,13 @@
 .image-processing {
-  position: relative;
   height: 100%;
+  overflow: auto;
   canvas {
     border: 1px solid $red;
   }
   .controls {
-    position: absolute;
-    bottom: $space-med;
-    width: 100%;
+    padding-top: $space-med;
+    max-width: #{map-get($breakpoints, 'small')};
+    margin: 0 auto;
     button {
       width: 100%
     }
