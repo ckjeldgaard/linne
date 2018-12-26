@@ -4,7 +4,13 @@ import {ImageFileConverter} from "./ImageFileConverter";
 import * as config from "react-global-configuration";
 import * as firebase from "firebase/app";
 import "firebase/storage";
+import "firebase/firestore";
 import UploadTaskSnapshot = firebase.storage.UploadTaskSnapshot;
+import {ResizePhoto} from "./ResizePhoto";
+import {ContrastPhoto} from "./ContrastPhoto";
+import {BrightenPhoto} from "./BrightenPhoto";
+import {CroppedPhoto} from "./CroppedPhoto";
+import {ClassifiedCoin} from "../model/classified-coin";
 
 const uuidv1 = require("uuid/v1");
 
@@ -22,29 +28,64 @@ export class ImageUpload {
         this.firebaseApp = firebase.initializeApp(config.get("firebaseConfig"));
     }
 
-    upload(): void {
-        this.uploadOriginal();
+    async upload(): Promise<void> {
+        // this.uploadOriginal();
+
+        let photo = new ResizePhoto(
+            new ContrastPhoto(
+                new BrightenPhoto(
+                    new CroppedPhoto(this.blob, this.originalImageWidth, this.originalImageHeight),
+                    50),
+                90),
+            28,
+            28
+        );
+
+        const imageData = await photo.draw();
+
+        // Upload 3 additional versions of the image rotated 90 degrees each:
+        for (let i = 90; i < 360; i += 90) {
+            console.log("i degrees = ", i);
+        }
+
+
+        this.uploadOriginal((snapshot: UploadTaskSnapshot, downloadUrl: string) => {
+
+            const coin = new ClassifiedCoin(snapshot.metadata.name, downloadUrl, this.chosenCoin.id, this.chosenSide, 0, imageData);
+            console.log("coin = ", coin);
+            this.writeCoinToDatabase(coin);
+
+            console.log("Successfully uploaded!", snapshot);
+        });
     }
 
-    private uploadOriginal(): void {
-        console.log("original = ", this.blob);
-        console.log("originalImageWidth = ", this.originalImageWidth);
-        console.log("originalImageHeight = ", this.originalImageHeight);
-        console.log("chosenCoin = ", this.chosenCoin);
-        console.log("chosenSide = ", this.chosenSide);
+    private writeCoinToDatabase(classifiedImage: ClassifiedCoin): void {
+        const db: firebase.firestore.Firestore = this.firebaseApp.firestore();
+        const key: string = db.collection("coins").doc().id;
 
+        db.collection("coins").doc(key)
+            .set(classifiedImage.toObject())
+            .then(() => {
+                console.log("Coin successfully written!");
+            })
+            .catch((error) => {
+                console.error("Error writing document: ", error);
+
+            });
+    }
+
+    private uploadOriginal(onFulfilled: ((snapshot: firebase.storage.UploadTaskSnapshot, downloadUrl: string) => any)): void {
         const fileName = uuidv1() + ".jpg";
         const file: File = new ImageFileConverter(this.blob).toFile(fileName);
-
-        console.log("file = ", file);
-        console.log("config = ", this.firebaseApp);
-
 
         const storageRef = this.firebaseApp.storage().ref();
         const originalsRef = storageRef.child("originals/" + fileName);
 
         originalsRef.put(file).then((snapshot: UploadTaskSnapshot) => {
-            console.log("Successfully uploaded!", snapshot);
+            snapshot.ref.getDownloadURL().then((downloadURL: string) => {
+                onFulfilled(snapshot, downloadURL);
+            });
+
         }).catch(reason => {
             console.error("Upload failed", reason);
         });

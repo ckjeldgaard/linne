@@ -3,12 +3,6 @@ import {ReactNode} from "react";
 import {Croppie, CroppieOptions} from "croppie";
 import {Coin} from "../../model/coin";
 import {Side} from "../../model/side";
-import {CroppedPhoto} from "../../util/CroppedPhoto";
-import {GreyPhoto} from "../../util/GreyPhoto";
-import {ContrastPhoto} from "../../util/ContrastPhoto";
-import {BrightenPhoto} from "../../util/BrightenPhoto";
-import {ResizePhoto} from "../../util/ResizePhoto";
-import {RotatePhoto} from "../../util/RotatePhoto";
 import {ImageUpload} from "../../util/ImageUpload";
 
 export interface ImageProcessingProps {
@@ -25,7 +19,6 @@ export interface ImageProcessingState {
 export default class ImageProcessing extends React.Component<ImageProcessingProps, ImageProcessingState> {
 
     private _previewField: any;
-    private processed: any;
     private fileReader = new FileReader();
     private select: string = "-- Select --";
     private imageWidth: number = 200;
@@ -91,7 +84,6 @@ export default class ImageProcessing extends React.Component<ImageProcessingProp
 
     private processImage(event: React.FormEvent<HTMLButtonElement>): void {
         this.cropper.result("blob").then(async (blob: Blob) => {
-            console.log("blob", blob);
 
             if (this.state.chosenCoin != null && this.state.chosenSide != null) {
                 new ImageUpload(
@@ -102,37 +94,11 @@ export default class ImageProcessing extends React.Component<ImageProcessingProp
                     this.state.chosenSide
                 ).upload();
             }
-
-            /* let canvasContext = this.processed.getContext("2d");
-
-            let photo = new ResizePhoto(
-                new ContrastPhoto(
-                    new BrightenPhoto(
-                        new GreyPhoto(
-                            new CroppedPhoto(blob, this.imageWidth, this.imageHeight)
-                        ),
-                        50),
-                    90),
-                28,
-                28
-            );
-            // photo = new ResizePhoto(photo, 200, 200);
-            const rphoto = new RotatePhoto(photo, 90);
-
-            const imageData = await rphoto.draw();
-
-            console.log("imageData = ", imageData);
-            console.log("imageData = ", imageData.width);
-            console.log("imageData = ", imageData.height);
-
-            canvasContext.putImageData(imageData, 0, 0, 0, 0, imageData.width, imageData.height); */
-
         });
     }
 
     render(): ReactNode {
         return <div className="image-processing">
-            <canvas ref={(p) => {this.processed = p; }} width="28" height="28" />
             <p>Crop and classify image</p>
             <div>
                 <img ref={(p) => {this._previewField = p; }} alt="Preview" />
