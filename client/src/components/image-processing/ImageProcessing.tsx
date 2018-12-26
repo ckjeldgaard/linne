@@ -9,6 +9,7 @@ import {ContrastPhoto} from "../../util/ContrastPhoto";
 import {BrightenPhoto} from "../../util/BrightenPhoto";
 import {ResizePhoto} from "../../util/ResizePhoto";
 import {RotatePhoto} from "../../util/RotatePhoto";
+import {ImageUpload} from "../../util/ImageUpload";
 
 export interface ImageProcessingProps {
     file: Blob;
@@ -33,8 +34,6 @@ export default class ImageProcessing extends React.Component<ImageProcessingProp
 
     constructor(props: ImageProcessingProps) {
         super(props);
-
-        console.log("props = ", this.props);
 
         this.state = {
             chosenCoin: null,
@@ -94,7 +93,17 @@ export default class ImageProcessing extends React.Component<ImageProcessingProp
         this.cropper.result("blob").then(async (blob: Blob) => {
             console.log("blob", blob);
 
-            let canvasContext = this.processed.getContext("2d");
+            if (this.state.chosenCoin != null && this.state.chosenSide != null) {
+                new ImageUpload(
+                    blob,
+                    this.imageWidth,
+                    this.imageHeight,
+                    this.state.chosenCoin,
+                    this.state.chosenSide
+                ).upload();
+            }
+
+            /* let canvasContext = this.processed.getContext("2d");
 
             let photo = new ResizePhoto(
                 new ContrastPhoto(
@@ -116,7 +125,7 @@ export default class ImageProcessing extends React.Component<ImageProcessingProp
             console.log("imageData = ", imageData.width);
             console.log("imageData = ", imageData.height);
 
-            canvasContext.putImageData(imageData, 0, 0, 0, 0, imageData.width, imageData.height);
+            canvasContext.putImageData(imageData, 0, 0, 0, 0, imageData.width, imageData.height); */
 
         });
     }
