@@ -8,6 +8,7 @@ import {GreyPhoto} from "../../util/GreyPhoto";
 import {ContrastPhoto} from "../../util/ContrastPhoto";
 import {BrightenPhoto} from "../../util/BrightenPhoto";
 import {ResizePhoto} from "../../util/ResizePhoto";
+import {RotatePhoto} from "../../util/RotatePhoto";
 
 export interface ImageProcessingProps {
     file: Blob;
@@ -95,18 +96,21 @@ export default class ImageProcessing extends React.Component<ImageProcessingProp
 
             let canvasContext = this.processed.getContext("2d");
 
-            const imageData = await new ResizePhoto(
-                    new ContrastPhoto(
-                        new BrightenPhoto(
-                            new GreyPhoto(
-                                new CroppedPhoto(blob, this.imageWidth, this.imageHeight)
-                            ),
+            let photo = new ResizePhoto(
+                new ContrastPhoto(
+                    new BrightenPhoto(
+                        new GreyPhoto(
+                            new CroppedPhoto(blob, this.imageWidth, this.imageHeight)
+                        ),
                         50),
                     90),
                 28,
                 28
-                )
-                .draw();
+            );
+            // photo = new ResizePhoto(photo, 200, 200);
+            const rphoto = new RotatePhoto(photo, 90);
+
+            const imageData = await rphoto.draw();
 
             console.log("imageData = ", imageData);
             console.log("imageData = ", imageData.width);
@@ -119,7 +123,7 @@ export default class ImageProcessing extends React.Component<ImageProcessingProp
 
     render(): ReactNode {
         return <div className="image-processing">
-            <canvas ref={(p) => {this.processed = p; }} width="200" height="200" />
+            <canvas ref={(p) => {this.processed = p; }} width="28" height="28" />
             <p>Crop and classify image</p>
             <div>
                 <img ref={(p) => {this._previewField = p; }} alt="Preview" />
