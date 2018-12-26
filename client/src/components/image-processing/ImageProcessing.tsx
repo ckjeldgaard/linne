@@ -5,6 +5,9 @@ import {Coin} from "../../model/coin";
 import {Side} from "../../model/side";
 import {CroppedPhoto} from "../../util/CroppedPhoto";
 import {GreyPhoto} from "../../util/GreyPhoto";
+import {ContrastPhoto} from "../../util/ContrastPhoto";
+import {BrightenPhoto} from "../../util/BrightenPhoto";
+import {ResizePhoto} from "../../util/ResizePhoto";
 
 export interface ImageProcessingProps {
     file: Blob;
@@ -92,9 +95,19 @@ export default class ImageProcessing extends React.Component<ImageProcessingProp
 
             let canvasContext = this.processed.getContext("2d");
 
-            const imageData = await new GreyPhoto(
-                new CroppedPhoto(blob, this.imageWidth, this.imageHeight)
-            ).draw();
+            const imageData = await new ResizePhoto(
+                    new ContrastPhoto(
+                        new BrightenPhoto(
+                            new GreyPhoto(
+                                new CroppedPhoto(blob, this.imageWidth, this.imageHeight)
+                            ),
+                        50),
+                    90),
+                28,
+                28
+                )
+                .draw();
+
             console.log("imageData = ", imageData);
             console.log("imageData = ", imageData.width);
             console.log("imageData = ", imageData.height);
