@@ -3,6 +3,8 @@ import {ReactNode} from "react";
 import {Croppie, CroppieOptions} from "croppie";
 import {Coin} from "../../model/coin";
 import {Side} from "../../model/side";
+import {CroppedPhoto} from "../../util/CroppedPhoto";
+import {GreyPhoto} from "../../util/GreyPhoto";
 
 export interface ImageProcessingProps {
     file: Blob;
@@ -18,8 +20,11 @@ export interface ImageProcessingState {
 export default class ImageProcessing extends React.Component<ImageProcessingProps, ImageProcessingState> {
 
     private _previewField: any;
+    private processed: any;
     private fileReader = new FileReader();
     private select: string = "-- Select --";
+    private imageWidth: number = 200;
+    private imageHeight: number = 200;
     private cropper: Croppie;
 
     constructor(props: ImageProcessingProps) {
@@ -44,7 +49,7 @@ export default class ImageProcessing extends React.Component<ImageProcessingProp
 
     private setCropper(): void {
         const options: CroppieOptions = {
-            viewport: { width: 200, height: 200, type: "circle" },
+            viewport: { width: this.imageWidth, height: this.imageHeight, type: "circle" },
             boundary: { width: 300, height: 300 },
             showZoomer: true,
             enableOrientation: true
@@ -82,13 +87,26 @@ export default class ImageProcessing extends React.Component<ImageProcessingProp
     }
 
     private processImage(event: React.FormEvent<HTMLButtonElement>): void {
-        this.cropper.result("blob").then((blob: Blob) => {
-            console.log("setCropper blob", blob);
+        this.cropper.result("blob").then(async (blob: Blob) => {
+            console.log("blob", blob);
+
+            let canvasContext = this.processed.getContext("2d");
+
+            const imageData = await new GreyPhoto(
+                new CroppedPhoto(blob, this.imageWidth, this.imageHeight)
+            ).draw();
+            console.log("imageData = ", imageData);
+            console.log("imageData = ", imageData.width);
+            console.log("imageData = ", imageData.height);
+
+            canvasContext.putImageData(imageData, 0, 0, 0, 0, imageData.width, imageData.height);
+
         });
     }
 
     render(): ReactNode {
         return <div className="image-processing">
+            <canvas ref={(p) => {this.processed = p; }} width="200" height="200" />
             <p>Crop and classify image</p>
             <div>
                 <img ref={(p) => {this._previewField = p; }} alt="Preview" />
