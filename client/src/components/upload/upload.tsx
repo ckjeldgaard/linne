@@ -1,7 +1,7 @@
 import * as React from "react";
 import {ReactNode} from "react";
 import * as ReactModal from "react-modal";
-import ImageProcessing from "../image-processing/ImageProcessing";
+import ImageProcessing from "../image-processing/image-processing";
 import {Coin} from "../../model/coin";
 
 export interface UploadState {

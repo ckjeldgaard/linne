@@ -1,17 +1,17 @@
 import {Coin} from "../model/coin";
 import {Side} from "../model/side";
-import {ImageFileConverter} from "./ImageFileConverter";
+import {ImageFileConverter} from "./image-file-converter";
 import * as config from "react-global-configuration";
 import * as firebase from "firebase/app";
 import "firebase/storage";
 import "firebase/firestore";
 import UploadTaskSnapshot = firebase.storage.UploadTaskSnapshot;
-import {ResizePhoto} from "./ResizePhoto";
-import {ContrastPhoto} from "./ContrastPhoto";
-import {BrightenPhoto} from "./BrightenPhoto";
-import {CroppedPhoto} from "./CroppedPhoto";
+import {ResizePhoto} from "./photo/resize-photo";
+import {ContrastPhoto} from "./photo/contrast-photo";
+import {BrightenPhoto} from "./photo/brighten-photo";
+import {CroppedPhoto} from "./photo/cropped-photo";
 import {ClassifiedCoin} from "../model/classified-coin";
-import {RotatePhoto} from "./RotatePhoto";
+import {RotatePhoto} from "./photo/rotate-photo";
 
 const uuidv1 = require("uuid/v1");
 
@@ -30,8 +30,6 @@ export class ImageUpload {
     }
 
     async upload(): Promise<void> {
-        // this.uploadOriginal();
-
         let photo = new ResizePhoto(
             new ContrastPhoto(
                 new BrightenPhoto(

@@ -3,7 +3,7 @@ import {ReactNode} from "react";
 import {Croppie, CroppieOptions} from "croppie";
 import {Coin} from "../../model/coin";
 import {Side} from "../../model/side";
-import {ImageUpload} from "../../util/ImageUpload";
+import {ImageUpload} from "../../domain/image-upload";
 
 export interface ImageProcessingProps {
     file: Blob;
