@@ -11,6 +11,7 @@ export interface ImageProcessingProps {
 }
 
 export interface ImageProcessingState {
+    loading: boolean;
     chosenCoin: Coin | null;
     chosenSide: Side | null;
     uploadDisabled: boolean;
@@ -29,6 +30,7 @@ export default class ImageProcessing extends React.Component<ImageProcessingProp
         super(props);
 
         this.state = {
+            loading: false,
             chosenCoin: null,
             chosenSide: null,
             uploadDisabled: true,
@@ -86,19 +88,28 @@ export default class ImageProcessing extends React.Component<ImageProcessingProp
         this.cropper.result("blob").then(async (blob: Blob) => {
 
             if (this.state.chosenCoin != null && this.state.chosenSide != null) {
-                new ImageUpload(
-                    blob,
-                    this.imageWidth,
-                    this.imageHeight,
-                    this.state.chosenCoin,
-                    this.state.chosenSide
-                ).upload();
+                console.log("Starting upload...");
+                this.setState({loading: true});
+                try {
+                    const result = await new ImageUpload(
+                        blob,
+                        this.imageWidth,
+                        this.imageHeight,
+                        this.state.chosenCoin,
+                        this.state.chosenSide
+                    ).upload();
+                    console.log("Successfully uploaded image", result);
+                } catch (e) {
+                    console.error("Error uploading image", e);
+                }
             }
         });
     }
 
     render(): ReactNode {
         return <div className="image-processing">
+            <div className={this.state.loading ? "loader" : "loader hidden"} />
+            <div className={this.state.loading ? "content dim" : "content"}>
             <p>Crop and classify image</p>
             <div>
                 <img ref={(p) => {this._previewField = p; }} alt="Preview" />
@@ -123,6 +134,7 @@ export default class ImageProcessing extends React.Component<ImageProcessingProp
                     </label>
                 </div>
                 <button className="btn--raised" disabled={this.state.uploadDisabled} onClick={e => this.processImage(e)}>Upload</button>
+            </div>
             </div>
         </div>;
     }

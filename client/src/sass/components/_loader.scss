@@ -1,0 +1,21 @@
+$loader-size: 120px;
+
+.loader {
+  border: 16px solid $silver;
+  border-top: 16px solid $brand-color;
+  border-radius: 50%;
+  width: $loader-size;
+  height: $loader-size;
+  animation: spin 2s linear infinite;
+  position: absolute;
+  left: 0;
+  right: 0;
+  margin-left: auto;
+  margin-right: auto;
+  z-index: 4;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
