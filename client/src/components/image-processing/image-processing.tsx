@@ -8,6 +8,7 @@ import {ImageUpload} from "../../domain/image-upload";
 export interface ImageProcessingProps {
     file: Blob;
     coinOptions: Coin[];
+    closeModal: any;
 }
 
 export interface ImageProcessingState {
@@ -99,6 +100,7 @@ export default class ImageProcessing extends React.Component<ImageProcessingProp
                         this.state.chosenSide
                     ).upload();
                     console.log("Successfully uploaded image", result);
+                    this.props.closeModal();
                 } catch (e) {
                     console.error("Error uploading image", e);
                 }

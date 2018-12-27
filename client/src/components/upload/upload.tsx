@@ -51,7 +51,7 @@ export default class Upload extends React.Component<{}, UploadState> {
                 className="modal"
                 overlayClassName="overlay">
                 <span className="close" onClick={this.closeModal}>×</span>
-                {this.state.chosenFile != null && <ImageProcessing file={this.state.chosenFile} coinOptions={this.coinOptions} />}
+                {this.state.chosenFile != null && <ImageProcessing file={this.state.chosenFile} coinOptions={this.coinOptions} closeModal={this.closeModal} />}
             </ReactModal>
         </article>;
     }
