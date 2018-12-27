@@ -7,7 +7,7 @@ import {MenuItem} from "../model/menuitem";
 
 export default class App extends React.Component {
 
-    public static readonly TITLE: string = "Krownify";
+    public static readonly TITLE: string = "Linné";
 
     private static menu(): MenuItem[] {
         const items: MenuItem[] = [];

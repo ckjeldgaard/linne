@@ -8,12 +8,12 @@ import "./sass/main.scss";
 
 config.set({
     firebaseConfig: {
-        apiKey: "AIzaSyCWRoMFsmWkC0AS5Wg5Mt7DfdVlI8V2gsU",
-        authDomain: "krownify.firebaseapp.com",
-        databaseURL: "https://krownify.firebaseio.com",
-        projectId: "krownify",
-        storageBucket: "krownify.appspot.com",
-        messagingSenderId: "879978171684"
+        apiKey: "AIzaSyCLBx1643KN6km_J1HCsd2unP9QLBIAF0k",
+        authDomain: "ml-linne.firebaseapp.com",
+        databaseURL: "https://ml-linne.firebaseio.com",
+        projectId: "ml-linne",
+        storageBucket: "ml-linne.appspot.com",
+        messagingSenderId: "920156771754"
     }
 });
 // const firebase = Firebase.initializeApp(config);

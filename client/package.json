@@ -1,7 +1,7 @@
 {
-  "name": "krownify",
+  "name": "linne",
   "version": "0.0.1",
-  "description": "Krownify web client for classifying Danish coins using TensorFlow.js",
+  "description": "Linné web client for classifying images using TensorFlow.js",
   "keywords": [
     "react",
     "tensorflow",
@@ -13,9 +13,9 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/ckjeldgaard/krownify.git"
+    "url": "git+https://github.com/ckjeldgaard/linne.git"
   },
-  "homepage": "https://github.com/ckjeldgaard/krownify",
+  "homepage": "https://github.com/ckjeldgaard/linne",
   "scripts": {
     "build": "npm run clean-dist && webpack -p --config=configs/webpack/prod.js",
     "clean-dist": "rm -f -r -d dist",
