@@ -1,4 +1,4 @@
-import {Photo} from "./";
+import {Photo} from "./photo";
 
 export class RotatePhoto implements Photo {
 

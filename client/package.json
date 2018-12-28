@@ -23,7 +23,8 @@
     "start": "npm run start-dev",
     "start-dev": "webpack-dev-server --config=configs/webpack/dev.js",
     "start-prod": "npm run build && node express.js",
-    "test": "jest --watch --coverage --config=configs/jest.json"
+    "test": "jest --watch --coverage --config=configs/jest.json",
+    "deploy": "tslint './src/**/*.ts*' './tests/**/*.tsx' && npm run build && firebase deploy"
   },
   "devDependencies": {
     "@babel/cli": "^7.2.0",

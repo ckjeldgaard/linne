@@ -1,6 +1,8 @@
 import * as React from "react";
 import {ReactNode} from "react";
-import {Croppie, CroppieOptions} from "croppie";
+import {CroppieOptions, ResultOptions} from "croppie";
+// @ts-ignore
+import {Croppie} from "croppie";
 import {Coin} from "../../model/coin";
 import {Side} from "../../model/side";
 import {ImageUpload} from "../../domain/image-upload";
@@ -25,7 +27,7 @@ export default class ImageProcessing extends React.Component<ImageProcessingProp
     private select: string = "-- Select --";
     private imageWidth: number = 200;
     private imageHeight: number = 200;
-    private cropper: Croppie;
+    private cropper: Croppie | null = null;
 
     constructor(props: ImageProcessingProps) {
         super(props);
@@ -86,26 +88,33 @@ export default class ImageProcessing extends React.Component<ImageProcessingProp
     }
 
     private processImage(event: React.FormEvent<HTMLButtonElement>): void {
-        this.cropper.result("blob").then(async (blob: Blob) => {
-
-            if (this.state.chosenCoin != null && this.state.chosenSide != null) {
-                console.log("Starting upload...");
-                this.setState({loading: true});
-                try {
-                    const result = await new ImageUpload(
-                        blob,
-                        this.imageWidth,
-                        this.imageHeight,
-                        this.state.chosenCoin,
-                        this.state.chosenSide
-                    ).upload();
-                    console.log("Successfully uploaded image", result);
-                    this.props.closeModal();
-                } catch (e) {
-                    console.error("Error uploading image", e);
+        if (this.cropper != null) {
+            let options: ResultOptions = {
+                format: "jpeg",
+                type: "blob",
+                circle: true
+            };
+            this.cropper.result(options).then(async (blob: Blob) => {
+                console.log("Got a blob", blob);
+                if (this.state.chosenCoin != null && this.state.chosenSide != null) {
+                    console.log("Starting upload...");
+                    this.setState({loading: true});
+                    try {
+                        const result = await new ImageUpload(
+                            blob,
+                            this.imageWidth,
+                            this.imageHeight,
+                            this.state.chosenCoin,
+                            this.state.chosenSide
+                        ).upload();
+                        console.log("Successfully uploaded image", result);
+                        this.props.closeModal();
+                    } catch (e) {
+                        console.error("Error uploading image", e);
+                    }
                 }
-            }
-        });
+            });
+        }
     }
 
     render(): ReactNode {
