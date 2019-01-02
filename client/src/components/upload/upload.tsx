@@ -2,7 +2,7 @@ import * as React from "react";
 import {ReactNode} from "react";
 import * as ReactModal from "react-modal";
 import ImageProcessing from "../image-processing/image-processing";
-import {Coin} from "../../model/coin";
+import {Item} from "../../model/item";
 
 export interface UploadState {
     chosenFile: Blob | null;
@@ -13,7 +13,7 @@ ReactModal.setAppElement("#root");
 export default class Upload extends React.Component<{}, UploadState> {
 
     private fileField: any;
-    private coinOptions: Coin[] = [
+    private itemOptions: Item[] = [
         { "id": 0, "label": "50 øre" },
         { "id": 1, "label": "1 kr." },
         { "id": 2, "label": "2 kr." },
@@ -51,7 +51,7 @@ export default class Upload extends React.Component<{}, UploadState> {
                 className="modal"
                 overlayClassName="overlay">
                 <span className="close" onClick={this.closeModal}>×</span>
-                {this.state.chosenFile != null && <ImageProcessing file={this.state.chosenFile} coinOptions={this.coinOptions} closeModal={this.closeModal} />}
+                {this.state.chosenFile != null && <ImageProcessing file={this.state.chosenFile} itemOptions={this.itemOptions} closeModal={this.closeModal} />}
             </ReactModal>
         </article>;
     }

@@ -1,5 +1,4 @@
-import {Coin} from "../model/coin";
-import {Side} from "../model/side";
+import {Item} from "../model/item";
 import {ImageFileConverter} from "./image-file-converter";
 import * as config from "react-global-configuration";
 import * as firebase from "firebase/app";
@@ -9,7 +8,7 @@ import {ResizePhoto} from "./photo/resize-photo";
 import {ContrastPhoto} from "./photo/contrast-photo";
 import {BrightenPhoto} from "./photo/brighten-photo";
 import {CroppedPhoto} from "./photo/cropped-photo";
-import {ClassifiedCoin} from "../model/classified-coin";
+import {ClassifiedItem} from "../model/classified-item";
 import {RotatePhoto} from "./photo/rotate-photo";
 
 const uuidv1 = require("uuid/v1");
@@ -26,8 +25,7 @@ export class ImageUpload {
         private readonly blob: Blob,
         private readonly originalImageWidth: number,
         private readonly originalImageHeight: number,
-        private readonly chosenCoin: Coin,
-        private readonly chosenSide: Side
+        private readonly chosenItem: Item
     ) {
         this.firebaseApp = firebase.initializeApp(config.get("firebaseConfig"));
     }
@@ -48,26 +46,26 @@ export class ImageUpload {
         const snapshot = await this.uploadOriginal();
         const downloadUrl = await ImageUpload.getImageDownloadUrl(snapshot.ref);
 
-        const coin = new ClassifiedCoin(snapshot.metadata.name, downloadUrl, this.chosenCoin.id, this.chosenSide, 0, imageData);
-        console.log("coin = ", coin.toObject());
+        const item = new ClassifiedItem(snapshot.metadata.name, downloadUrl, this.chosenItem.id,0, imageData);
+        console.log("item = ", item.toObject());
 
-        const coinRequests = [];
-        coinRequests.push(this.writeCoinToDatabase(coin));
+        const itemRequests = [];
+        itemRequests.push(this.writeItemToDatabase(item));
 
         // Upload 3 additional versions of the image rotated 90 degrees each:
         for (let i = 90; i < 360; i += 90) {
             const rotatedImage = await new RotatePhoto(photo, i).draw();
-            const coin = new ClassifiedCoin(snapshot.metadata.name, downloadUrl, this.chosenCoin.id, this.chosenSide, i, rotatedImage);
-            coinRequests.push(this.writeCoinToDatabase(coin));
+            const item = new ClassifiedItem(snapshot.metadata.name, downloadUrl, this.chosenItem.id, i, rotatedImage);
+            itemRequests.push(this.writeItemToDatabase(item));
         }
 
-        return await Promise.all(coinRequests);
+        return await Promise.all(itemRequests);
     }
 
-    private async writeCoinToDatabase(classifiedImage: ClassifiedCoin): Promise<void> {
+    private async writeItemToDatabase(classifiedImage: ClassifiedItem): Promise<void> {
         const db: firebase.firestore.Firestore = this.firebaseApp.firestore();
-        const key: string = db.collection("coins").doc().id;
-        return await db.collection("coins").doc(key).set(classifiedImage.toObject());
+        const key: string = db.collection("items").doc().id;
+        return await db.collection("items").doc(key).set(classifiedImage.toObject());
     }
 
     private async uploadOriginal(): Promise<firebase.storage.UploadTaskSnapshot> {

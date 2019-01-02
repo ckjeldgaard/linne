@@ -3,20 +3,18 @@ import {ReactNode} from "react";
 import {CroppieOptions, ResultOptions} from "croppie";
 // @ts-ignore
 import {Croppie} from "croppie";
-import {Coin} from "../../model/coin";
-import {Side} from "../../model/side";
+import {Item} from "../../model/item";
 import {ImageUpload} from "../../domain/image-upload";
 
 export interface ImageProcessingProps {
     file: Blob;
-    coinOptions: Coin[];
+    itemOptions: Item[];
     closeModal: any;
 }
 
 export interface ImageProcessingState {
     loading: boolean;
-    chosenCoin: Coin | null;
-    chosenSide: Side | null;
+    chosenItem: Item | null;
     uploadDisabled: boolean;
 }
 
@@ -34,8 +32,7 @@ export default class ImageProcessing extends React.Component<ImageProcessingProp
 
         this.state = {
             loading: false,
-            chosenCoin: null,
-            chosenSide: null,
+            chosenItem: null,
             uploadDisabled: true,
         };
 
@@ -62,29 +59,15 @@ export default class ImageProcessing extends React.Component<ImageProcessingProp
         });
     }
 
-    private selectCoin(event: React.FormEvent<HTMLSelectElement>): void {
-        const chosen: Coin | null = (event.currentTarget.value !== this.select) ? this.props.coinOptions[+event.currentTarget.value] : null;
+    private selectItem(event: React.FormEvent<HTMLSelectElement>): void {
+        const chosen: Item | null = (event.currentTarget.value !== this.select) ? this.props.itemOptions[+event.currentTarget.value] : null;
         this.setState({
-            chosenCoin: chosen
+            chosenItem: chosen
         }, () => this.validateFields());
     }
 
-    private selectSide(event: React.FormEvent<HTMLSelectElement>): void {
-        switch (event.currentTarget.value) {
-            case "Observe":
-                this.setState({chosenSide: Side.Observe}, () => this.validateFields());
-                break;
-            case "Reverse":
-                this.setState({chosenSide: Side.Reverse}, () => this.validateFields());
-                break;
-            default:
-                this.setState({chosenSide: null}, () => this.validateFields());
-                break;
-        }
-    }
-
     private validateFields(): void {
-        this.setState({uploadDisabled: (!(this.state.chosenCoin != null && this.state.chosenSide != null))});
+        this.setState({uploadDisabled: this.state.chosenItem == null});
     }
 
     private processImage(event: React.FormEvent<HTMLButtonElement>): void {
@@ -96,7 +79,7 @@ export default class ImageProcessing extends React.Component<ImageProcessingProp
             };
             this.cropper.result(options).then(async (blob: Blob) => {
                 console.log("Got a blob", blob);
-                if (this.state.chosenCoin != null && this.state.chosenSide != null) {
+                if (this.state.chosenItem != null) {
                     console.log("Starting upload...");
                     this.setState({loading: true});
                     try {
@@ -104,8 +87,7 @@ export default class ImageProcessing extends React.Component<ImageProcessingProp
                             blob,
                             this.imageWidth,
                             this.imageHeight,
-                            this.state.chosenCoin,
-                            this.state.chosenSide
+                            this.state.chosenItem
                         ).upload();
                         console.log("Successfully uploaded image", result);
                         this.props.closeModal();
@@ -127,20 +109,13 @@ export default class ImageProcessing extends React.Component<ImageProcessingProp
             </div>
             <div className="controls">
                 <div className="classify">
-                    <label htmlFor="coin">Coin:
-                        <select id="coin" onChange={e => this.selectCoin(e)}>
+                    <label htmlFor="item">Item:
+                        <select id="item" onChange={e => this.selectItem(e)}>
                             <option>-- Select --</option>{
-                                this.props.coinOptions.map((coin) => {
-                                    return <option key={coin.id} value={coin.id}>{coin.label}</option>;
+                                this.props.itemOptions.map((item) => {
+                                    return <option key={item.id} value={item.id}>{item.label}</option>;
                                 })
                             }
-                        </select>
-                    </label>
-                    <label htmlFor="side">Side:
-                        <select id="side" onChange={e => this.selectSide(e)}>
-                            <option>-- Select --</option>
-                            <option>Observe</option>
-                            <option>Reverse</option>
                         </select>
                     </label>
                 </div>

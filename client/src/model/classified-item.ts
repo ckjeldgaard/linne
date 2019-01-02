@@ -1,9 +1,8 @@
-export class ClassifiedCoin {
+export class ClassifiedItem {
 
     constructor(private readonly originalRef: string,
     private readonly originalRefUrl: string,
-    private readonly coinLabel: number,
-    private readonly coinSide: number,
+    private readonly itemLabel: number,
     private readonly degrees: number,
     private readonly imageData: ImageData) {}
 
@@ -11,8 +10,7 @@ export class ClassifiedCoin {
         return {
             originalRef: this.originalRef,
             originalRefUrl: this.originalRefUrl,
-            coinLabel: this.coinLabel,
-            coinSide: this.coinSide,
+            itemLabel: this.itemLabel,
             degrees: this.degrees,
             image: this.toImageMatrix()
         };
