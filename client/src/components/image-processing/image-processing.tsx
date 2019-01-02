@@ -5,6 +5,7 @@ import {CroppieOptions, ResultOptions} from "croppie";
 import {Croppie} from "croppie";
 import {Item} from "../../model/item";
 import {ImageUpload} from "../../domain/image-upload";
+import {Photo} from "../../domain/photo/photo";
 
 export interface ImageProcessingProps {
     file: Blob;
@@ -23,6 +24,7 @@ export default class ImageProcessing extends React.Component<ImageProcessingProp
     private _previewField: any;
     private fileReader = new FileReader();
     private select: string = "-- Select --";
+    private imageUpload = new ImageUpload();
     private imageWidth: number = 200;
     private imageHeight: number = 200;
     private cropper: Croppie | null = null;
@@ -47,7 +49,7 @@ export default class ImageProcessing extends React.Component<ImageProcessingProp
 
     private setCropper(): void {
         const options: CroppieOptions = {
-            viewport: { width: this.imageWidth, height: this.imageHeight, type: "circle" },
+            viewport: { width: this.imageWidth, height: this.imageHeight, type: "square" },
             boundary: { width: 280, height: 280 },
             showZoomer: true,
             enableOrientation: true
@@ -75,7 +77,7 @@ export default class ImageProcessing extends React.Component<ImageProcessingProp
             let options: ResultOptions = {
                 format: "jpeg",
                 type: "blob",
-                circle: true
+                circle: false
             };
             this.cropper.result(options).then(async (blob: Blob) => {
                 console.log("Got a blob", blob);
@@ -83,13 +85,12 @@ export default class ImageProcessing extends React.Component<ImageProcessingProp
                     console.log("Starting upload...");
                     this.setState({loading: true});
                     try {
-                        const result = await new ImageUpload(
-                            blob,
+                        const result: Photo = await this.imageUpload.upload(blob,
                             this.imageWidth,
                             this.imageHeight,
-                            this.state.chosenItem
-                        ).upload();
+                            this.state.chosenItem);
                         console.log("Successfully uploaded image", result);
+
                         this.props.closeModal();
                     } catch (e) {
                         console.error("Error uploading image", e);

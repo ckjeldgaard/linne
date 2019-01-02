@@ -3,7 +3,7 @@ export class ClassifiedItem {
     constructor(private readonly originalRef: string,
     private readonly originalRefUrl: string,
     private readonly itemLabel: number,
-    private readonly degrees: number,
+    private readonly mirrored: boolean,
     private readonly imageData: ImageData) {}
 
     public toObject(): object {
@@ -11,7 +11,7 @@ export class ClassifiedItem {
             originalRef: this.originalRef,
             originalRefUrl: this.originalRefUrl,
             itemLabel: this.itemLabel,
-            degrees: this.degrees,
+            mirrored: this.mirrored,
             image: this.toImageMatrix()
         };
     }
