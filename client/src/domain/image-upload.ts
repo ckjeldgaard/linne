@@ -42,7 +42,7 @@ export class ImageUpload {
         const snapshot = await this.uploadOriginal(blob);
         const downloadUrl = await ImageUpload.getImageDownloadUrl(snapshot.ref);
 
-        const item = new ClassifiedItem(snapshot.metadata.name, downloadUrl, chosenItem.id,false, imageData);
+        const item = new ClassifiedItem(snapshot.metadata.name, downloadUrl, chosenItem.id, false, imageData);
         console.log("item = ", item.toObject());
 
         const itemRequests = [];
