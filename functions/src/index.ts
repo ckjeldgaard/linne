@@ -10,7 +10,10 @@ const getTrainingImages = async function(): Promise<Compound> {
     const images: number[][][] = [];
     const labels: number[] = [];
 
-    const querySnapshot: firebase.firestore.QuerySnapshot = await firebase.firestore().collection("training").limit(10).get();
+    const querySnapshot: firebase.firestore.QuerySnapshot = await firebase.firestore().collection("training")
+        .select("image", "itemLabel")
+        .limit(10)
+        .get();
     querySnapshot.forEach((doc: DocumentSnapshot) => {
         const matrix = transformImageData(doc.data().image);
         images.push(matrix);
