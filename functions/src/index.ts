@@ -39,7 +39,6 @@ const getTrainingImages = async function(): Promise<Compound> {
 
     const querySnapshot: firebase.firestore.QuerySnapshot = await firebase.firestore().collection("training")
         .select("image", "itemLabel")
-        .limit(50)
         .get();
     querySnapshot.forEach((doc: DocumentSnapshot) => {
         const matrix = transformImageData(doc.data().image);
