@@ -3,6 +3,8 @@ import * as firebase from "firebase-admin";
 import * as tf from "@tensorflow/tfjs";
 import {DocumentSnapshot} from "firebase-functions/lib/providers/firestore";
 import {Compound} from "./compound";
+import {join} from "path";
+import {Bucket} from "@google-cloud/storage";
 
 const util_1 = require("util");
 require("util.promisify").shim();
@@ -12,6 +14,10 @@ import {Rank, Tensor} from "@tensorflow/tfjs-core";
 
 // The Firebase Admin SDK to access the Firestore Database.
 firebase.initializeApp();
+
+const tmpdir = require("os").tmpdir();
+const fs = require("fs");
+const modelPath = join(tmpdir, "tfjs-model");
 
 const transformImageData = function (imageData: object[]): number[][] {
     const matrix: number[][] = [];
@@ -33,6 +39,7 @@ const getTrainingImages = async function(): Promise<Compound> {
 
     const querySnapshot: firebase.firestore.QuerySnapshot = await firebase.firestore().collection("training")
         .select("image", "itemLabel")
+        .limit(50)
         .get();
     querySnapshot.forEach((doc: DocumentSnapshot) => {
         const matrix = transformImageData(doc.data().image);
@@ -40,6 +47,24 @@ const getTrainingImages = async function(): Promise<Compound> {
         labels.push(doc.data().itemLabel);
     });
     return new Compound(images, labels);
+};
+
+const uploadModelFiles = async function(): Promise<boolean> {
+
+    const bucket: Bucket = firebase.storage().bucket(firebase.app().options.storageBucket);
+
+    const tempJSONPath = join(modelPath, "model.json");
+    const tempBINPath = join(modelPath, "weights.bin");
+
+    await bucket.upload(tempJSONPath);
+    console.log("Uploaded", tempJSONPath);
+    await bucket.upload(tempBINPath);
+    console.log("Uploaded", tempBINPath);
+
+    fs.unlinkSync(tempJSONPath);
+    fs.unlinkSync(tempBINPath);
+
+    return true;
 };
 
 export const tensorflow = functions.https.onRequest(async (request, response) => {
@@ -72,8 +97,9 @@ export const tensorflow = functions.https.onRequest(async (request, response) =>
             console.log("Done training");
 
             // Saving to file system:
-            const saveResult = await model.save(new NodeFileSystem("/tmp/linne-tfjs-model"));
+            const saveResult = await model.save(new NodeFileSystem(modelPath));
             console.log("saveResult = ", saveResult);
+            await uploadModelFiles();
         });
         response.send("Success! Trained the model.");
     } catch (e) {
