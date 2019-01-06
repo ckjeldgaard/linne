@@ -5,7 +5,11 @@ import ContentArea from "./content-area/content-area";
 import Nav from "./nav/nav";
 import {MenuItem} from "../model/menuitem";
 
-export default class App extends React.Component {
+export interface AppProps {
+    firebase: firebase.app.App;
+}
+
+export default class App extends React.Component<AppProps> {
 
     public static readonly TITLE: string = "Linné";
 
@@ -21,7 +25,7 @@ export default class App extends React.Component {
     render(): ReactNode {
         return <div className="app">
             <Header title={App.TITLE} />
-            <ContentArea  />
+            <ContentArea firebase={this.props.firebase} />
             <Nav menuItems={App.menu()} />
         </div>;
     }

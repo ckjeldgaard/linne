@@ -4,25 +4,33 @@ import * as ReactModal from "react-modal";
 import ImageProcessing from "../image-processing/image-processing";
 import {Item} from "../../model/item";
 
+export interface UploadProps {
+    firebase: firebase.app.App;
+}
+
 export interface UploadState {
     chosenFile: Blob | null;
 }
 
 ReactModal.setAppElement("#root");
 
-export default class Upload extends React.Component<{}, UploadState> {
+export default class Upload extends React.Component<UploadProps, UploadState> {
 
     private fileField: any;
     private itemOptions: Item[] = [
-        { "id": 0, "label": "50 øre" },
-        { "id": 1, "label": "1 kr." },
-        { "id": 2, "label": "2 kr." },
-        { "id": 3, "label": "5 kr." },
-        { "id": 4, "label": "10 kr." },
-        { "id": 5, "label": "20 kr." },
+        { "id": 0, "label": "T-shirt/top" },
+        { "id": 1, "label": "Trouser" },
+        { "id": 2, "label": "Pullover" },
+        { "id": 3, "label": "Dress" },
+        { "id": 4, "label": "Coat" },
+        { "id": 5, "label": "Sandal" },
+        { "id": 6, "label": "Shirt" },
+        { "id": 7, "label": "Sneaker" },
+        { "id": 8, "label": "Bag" },
+        { "id": 9, "label": "Ankle boot" },
     ];
 
-    constructor(props: any, state: UploadState) {
+    constructor(props: UploadProps, state: UploadState) {
         super(props, state);
         this.onFileChosen = this.onFileChosen.bind(this);
 
@@ -51,7 +59,7 @@ export default class Upload extends React.Component<{}, UploadState> {
                 className="modal"
                 overlayClassName="overlay">
                 <span className="close" onClick={this.closeModal}>×</span>
-                {this.state.chosenFile != null && <ImageProcessing file={this.state.chosenFile} itemOptions={this.itemOptions} closeModal={this.closeModal} />}
+                {this.state.chosenFile != null && <ImageProcessing firebase={this.props.firebase} file={this.state.chosenFile} itemOptions={this.itemOptions} closeModal={this.closeModal} />}
             </ReactModal>
         </article>;
     }

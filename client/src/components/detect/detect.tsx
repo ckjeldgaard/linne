@@ -1,7 +1,16 @@
 import * as React from "react";
 import {ReactNode} from "react";
 
-export default class Detect extends React.Component {
+export interface DetectProps {
+    firebase: firebase.app.App;
+}
+
+export default class Detect extends React.Component<DetectProps> {
+
+    /* constructor() {
+        super();
+
+    } */
 
     render(): ReactNode {
         return <article>

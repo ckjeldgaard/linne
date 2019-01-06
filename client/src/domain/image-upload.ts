@@ -1,6 +1,5 @@
 import {Item} from "../model/item";
 import {ImageFileConverter} from "./image-file-converter";
-import * as config from "react-global-configuration";
 import * as firebase from "firebase/app";
 import "firebase/storage";
 import "firebase/firestore";
@@ -22,8 +21,8 @@ export class ImageUpload {
     private static readonly CONTRAST: number = 90;
     private static readonly IMAGE_SIZE_PIXELS: number = 28;
 
-    constructor() {
-        this.firebaseApp = firebase.initializeApp(config.get("firebaseConfig"));
+    constructor(firebase: firebase.app.App) {
+        this.firebaseApp = firebase;
     }
 
     async upload(blob: Blob, originalImageWidth: number, originalImageHeight: number, chosenItem: Item): Promise<Photo> {

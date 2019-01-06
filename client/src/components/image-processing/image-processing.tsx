@@ -8,6 +8,7 @@ import {ImageUpload} from "../../domain/image-upload";
 import {Photo} from "../../domain/photo/photo";
 
 export interface ImageProcessingProps {
+    firebase: firebase.app.App;
     file: Blob;
     itemOptions: Item[];
     closeModal: any;
@@ -24,7 +25,7 @@ export default class ImageProcessing extends React.Component<ImageProcessingProp
     private _previewField: any;
     private fileReader = new FileReader();
     private select: string = "-- Select --";
-    private imageUpload = new ImageUpload();
+    private imageUpload = new ImageUpload(this.props.firebase);
     private imageWidth: number = 200;
     private imageHeight: number = 200;
     private cropper: Croppie | null = null;
