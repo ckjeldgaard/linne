@@ -66,7 +66,13 @@ const uploadModelFiles = async function(): Promise<boolean> {
     return true;
 };
 
-export const tensorflow = functions.https.onRequest(async (request, response) => {
+const runtimeOpts = {
+    timeoutSeconds: 540,
+    memory: "2GB"
+};
+
+// @ts-ignore
+export const tensorflow = functions.runWith(runtimeOpts).https.onRequest(async (request, response) => {
     const data: Compound = await getTrainingImages();
 
     console.log("images shape = [" + data.images.length + ", " + data.images[0].length + ", " + data.images[0][0].length + "]");
