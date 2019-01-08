@@ -53,7 +53,7 @@ export default class Detect extends React.Component<DetectProps, DetectState> {
     private async accessWebcam(): Promise<void> {
         if (navigator.mediaDevices.getUserMedia && this.video != null) {
             try {
-                let front = false;
+                let front = true;
                 const constraints = {
                     video: {
                         facingMode: (front ? "user" : "environment")
@@ -80,15 +80,18 @@ export default class Detect extends React.Component<DetectProps, DetectState> {
         if (this.preview != null) {
             const context = this.preview.getContext("2d");
             if (context != null) {
-                const sourceX = (img.width - img.height) / 2;
-                const sourceY = 0;
-                const sourceWidth = img.height;
-                const sourceHeight = img.height;
+
+                const portrait: boolean = (img.width < img.height);
+
+                const sourceX = (portrait) ? 0 : (img.width - img.height) / 2;
+                const sourceY = (portrait) ? (img.height - img.width) / 2 : 0;
+                const sourceWidth = (portrait) ? img.width : img.height;
+                const sourceHeight = (portrait) ? img.width : img.height;
                 const destWidth = this.preview.width;
                 const destHeight = this.preview.height;
                 const destX = 0;
                 const destY = 0;
-
+                
                 context.drawImage(img, sourceX, sourceY, sourceWidth, sourceHeight, destX, destY, destWidth, destHeight);
                 this.preview.toBlob(async (blob: Blob | null) => {
                     if (blob != null && this.preview != null) {
