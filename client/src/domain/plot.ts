@@ -19,7 +19,7 @@ export class Plot {
         });
     }
 
-    private plotImage(imageData: ImageData) {
+    private plotImage(imageData: ImageData): void {
         const cellSize = Math.floor(this.canvasSize / this.imageData.length);
         for (let i = 0; i < this.imageData.length; i ++) {
             for (let j = 0; j < this.imageData[i].length; j ++) {
@@ -34,7 +34,7 @@ export class Plot {
         }
     }
 
-    private static setPixel(imageData: ImageData, x: number, y: number, r: number, g: number, b: number, a: number){
+    private static setPixel(imageData: ImageData, x: number, y: number, r: number, g: number, b: number, a: number): void {
         const index = (x + y * imageData.width);
         imageData.data[index * 4] = r;
         imageData.data[index * 4 + 1] = g;

@@ -45,12 +45,12 @@ export default class Detect extends React.Component<DetectProps, DetectState> {
         this.state = { prediction: "" };
     }
 
-    async componentDidMount() {
+    async componentDidMount(): Promise<void> {
         await this.getModelFiles();
         this.accessWebcam();
     }
 
-    private async accessWebcam() {
+    private async accessWebcam(): Promise<void> {
         if (navigator.mediaDevices.getUserMedia && this.video != null) {
             try {
                 const mediaStream = await navigator.mediaDevices.getUserMedia({video: true});
@@ -70,7 +70,7 @@ export default class Detect extends React.Component<DetectProps, DetectState> {
         }
     }
 
-    private retrieveImage(img: ImageBitmap) {
+    private retrieveImage(img: ImageBitmap): void {
         if (this.preview != null) {
             const context = this.preview.getContext("2d");
             if (context != null) {
@@ -118,13 +118,11 @@ export default class Detect extends React.Component<DetectProps, DetectState> {
 
         const modelJsonFile = await this.downloadStorageFile(modelUrl, "model.json", "application/json");
         const weightsFile = await this.downloadStorageFile(weightsUrl, "weights.bin", "application/octet-stream");
-        console.log("modelJsonFile = ", modelJsonFile);
-        console.log("weightsFile = ", weightsFile);
-        
+
         this.model = await tf.loadModel(tf.io.browserFiles([modelJsonFile, weightsFile]));
     }
 
-    private async predictMatrix(matrix: number[][]) {
+    private async predictMatrix(matrix: number[][]): Promise<void> {
         if (this.model != null) {
             const tshirtTensor: Tensor3D = tf.tensor3d([matrix], [1, 28, 28]);
 
