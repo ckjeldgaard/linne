@@ -53,14 +53,16 @@ export default class Detect extends React.Component<DetectProps, DetectState> {
     private async accessWebcam(): Promise<void> {
         if (navigator.mediaDevices.getUserMedia && this.video != null) {
             try {
-                const mediaStream = await navigator.mediaDevices.getUserMedia({video: true});
+                let front = false;
+                const constraints = { video: { facingMode: (front? "user" : "environment") } };
+                const mediaStream = await navigator.mediaDevices.getUserMedia(constraints);
                 this.video.srcObject = mediaStream;
 
                 const track = mediaStream.getVideoTracks()[0];
+
                 window.setInterval(async () => {
                     let imageCapture = new ImageCapture(track);
                     const bitmap = await imageCapture.grabFrame();
-                    console.log("bitmap", bitmap);
                     this.retrieveImage(bitmap);
                 }, 500);
 
@@ -99,8 +101,6 @@ export default class Detect extends React.Component<DetectProps, DetectState> {
                         const imageData = await photo.draw();
                         const matrix = new Transform().toMatrix(new Transform().toObjectList(imageData));
 
-                        console.log("matrix", matrix);
-
                         // const greyImageData = await new Plot(matrix,200).toCanvasImageData();
                         // context.putImageData(greyImageData, 0, 0, 0, 0, greyImageData.width, greyImageData.height);
 
@@ -129,8 +129,6 @@ export default class Detect extends React.Component<DetectProps, DetectState> {
             const prediction: Tensor<Rank> = this.model.predict(tshirtTensor) as Tensor<Rank>;
             const data = await prediction.as1D().data();
             const argMax = await prediction.as1D().argMax().data();
-            console.log("data = ", data);
-            console.log("argMax = ", argMax[0]);
 
             const pct = (data[argMax[0]] * 100).toFixed(2);
 
