@@ -11,6 +11,7 @@ import {BrightenPhoto} from "../../domain/photo/brighten-photo";
 import {CroppedPhoto} from "../../domain/photo/cropped-photo";
 import {ImageUpload} from "../../domain/image-upload";
 import {Item} from "../../model/item";
+import {Plot} from "../../domain/plot";
 
 export interface DetectProps {
     firebase: firebase.app.App;
@@ -23,6 +24,7 @@ export interface DetectState {
 export default class Detect extends React.Component<DetectProps, DetectState> {
 
     private preview: HTMLCanvasElement | null = null;
+    private matrixCanvas: HTMLCanvasElement | null = null;
     private video: HTMLVideoElement | null = null;
     private model: Model | null = null;
 
@@ -108,12 +110,20 @@ export default class Detect extends React.Component<DetectProps, DetectState> {
                         const imageData = await photo.draw();
                         const matrix = new Transform().toMatrix(new Transform().toObjectList(imageData));
 
-                        // const greyImageData = await new Plot(matrix,200).toCanvasImageData();
-                        // context.putImageData(greyImageData, 0, 0, 0, 0, greyImageData.width, greyImageData.height);
-
+                        this.plot(matrix);
                         this.predictMatrix(matrix);
                     }
                 });
+            }
+        }
+    }
+
+    private async plot(matrix: number[][]): Promise<void> {
+        if (this.matrixCanvas != null) {
+            const context = this.matrixCanvas.getContext("2d");
+            if (context != null) {
+                const greyImageData = await new Plot(matrix, this.matrixCanvas.width).toCanvasImageData();
+                context.putImageData(greyImageData, 0, 0, 0, 0, greyImageData.width, greyImageData.height);
             }
         }
     }
@@ -190,6 +200,9 @@ export default class Detect extends React.Component<DetectProps, DetectState> {
             <p>{this.state.prediction}</p>
             <div className="container">
                 <video ref={(v) => {this.video = v; }} autoPlay={true} id="webcam" />
+            </div>
+            <div className="matrix-canvas-container">
+                <canvas id="matrix-canvas" ref={(p) => {this.matrixCanvas = p; }} width="150" height="150" />
             </div>
         </article>;
     }

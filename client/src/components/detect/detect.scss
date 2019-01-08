@@ -5,6 +5,10 @@ $video-border: 10px;
 #preview-canvas {
   display:none;
 }
+.matrix-canvas-container {
+  margin: $space-med auto;
+  width: 150px;
+}
 .container {
   position: relative;
   padding-bottom: 56.25%; /*16:9*/
