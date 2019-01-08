@@ -24,6 +24,7 @@
     "start-dev": "webpack-dev-server --config=configs/webpack/dev.js",
     "start-prod": "npm run build && node express.js",
     "test": "jest --watch --coverage --config=configs/jest.json",
+    "deploy-hosting": "tslint './src/**/*.ts*' './tests/**/*.tsx' && npm run build && firebase deploy --only hosting",
     "deploy": "tslint './src/**/*.ts*' './tests/**/*.tsx' && npm run build && firebase deploy"
   },
   "devDependencies": {
