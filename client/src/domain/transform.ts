@@ -8,7 +8,7 @@ export class Transform {
             Object.keys(row).forEach(key => {
                 if (row.hasOwnProperty(key)) {
                     const val = (row as any)[key];
-                    matrixRow.push(val);
+                    matrixRow.push(1 - val);
                 }
             });
             matrix.push(matrixRow);

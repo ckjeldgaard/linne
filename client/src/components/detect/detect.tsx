@@ -2,7 +2,7 @@ import * as React from "react";
 import {ReactNode} from "react";
 import * as firebase from "firebase";
 import * as tf from "@tensorflow/tfjs";
-import {Tensor2D} from "@tensorflow/tfjs";
+import {Tensor3D} from "@tensorflow/tfjs";
 import {Plot} from "../../domain/plot";
 import {Transform} from "../../domain/transform";
 
@@ -36,12 +36,15 @@ export default class Detect extends React.Component<DetectProps> {
 
         console.log("model = ", model);
 
-        const tshirtJson = require('./tshirt.json');
+        const tshirtJson = require('./trousers.json');
         const tshirtMatrix = new Transform().toMatrix(tshirtJson);
-        const tshirtTensor: Tensor2D = tf.tensor2d(tshirtMatrix, [28, 28]);
+        const tshirtTensor: Tensor3D = tf.tensor3d([tshirtMatrix], [1, 28, 28]);
 
         console.log("tshirtMatrix = ", tshirtMatrix);
         console.log("tshirtTensor = ", tshirtTensor);
+
+        const pre = model.predict(tshirtTensor);
+        console.log("predict = ", pre.toString());
 
         // Plot image:
         let canvasContext = this.preview.getContext("2d");
