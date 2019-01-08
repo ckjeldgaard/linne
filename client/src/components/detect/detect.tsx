@@ -54,7 +54,11 @@ export default class Detect extends React.Component<DetectProps, DetectState> {
         if (navigator.mediaDevices.getUserMedia && this.video != null) {
             try {
                 let front = false;
-                const constraints = { video: { facingMode: (front? "user" : "environment") } };
+                const constraints = {
+                    video: {
+                        facingMode: (front ? "user" : "environment")
+                    }
+                };
                 const mediaStream = await navigator.mediaDevices.getUserMedia(constraints);
                 this.video.srcObject = mediaStream;
 
