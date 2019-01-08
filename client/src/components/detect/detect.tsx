@@ -55,7 +55,7 @@ export default class Detect extends React.Component<DetectProps, DetectState> {
     private async accessWebcam(): Promise<void> {
         if (navigator.mediaDevices.getUserMedia && this.video != null) {
             try {
-                let front = true;
+                let front = false;
                 const constraints = {
                     video: {
                         facingMode: (front ? "user" : "environment")
