@@ -93,7 +93,8 @@ export default class Detect extends React.Component<DetectProps, DetectState> {
                 const destHeight = this.preview.height;
                 const destX = 0;
                 const destY = 0;
-                
+
+
                 context.drawImage(img, sourceX, sourceY, sourceWidth, sourceHeight, destX, destY, destWidth, destHeight);
                 this.preview.toBlob(async (blob: Blob | null) => {
                     if (blob != null && this.preview != null) {
@@ -150,7 +151,7 @@ export default class Detect extends React.Component<DetectProps, DetectState> {
             const pct = (data[argMax[0]] * 100).toFixed(2);
 
             let predictionText = "Detecting...";
-            if ((data[argMax[0]] * 100) > 80.0) {
+            if ((data[argMax[0]] * 100) > 60.0) {
                 predictionText = this.labels[argMax[0]].label + " (" + pct + " %)";
             }
 
