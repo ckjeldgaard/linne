@@ -5,7 +5,7 @@ export class SlidingWindow {
         private readonly stepSize: number = 32,
         private readonly windowSize: number = 128) {}
 
-    window(callback: (x: number, y: number, data: ImageData) => void) {
+    window(callback: (x: number, y: number, data: ImageData) => void): void {
 
         for (let y = 0; y <= (this.image.height - this.windowSize); y += this.stepSize) {
             for (let x = 0; x <= (this.image.width - this.windowSize); x += this.stepSize) {

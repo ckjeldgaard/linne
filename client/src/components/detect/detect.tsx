@@ -8,10 +8,12 @@ import {Model, Tensor, Rank} from "@tensorflow/tfjs";
 import {ResizePhoto} from "../../domain/photo/resize-photo";
 import {ContrastPhoto} from "../../domain/photo/contrast-photo";
 import {BrightenPhoto} from "../../domain/photo/brighten-photo";
-import {CroppedPhoto} from "../../domain/photo/cropped-photo";
 import {ImageUpload} from "../../domain/image-upload";
 import {Item} from "../../model/item";
 import {Plot} from "../../domain/plot";
+import {ImagePyramid} from "../../domain/object_detection/image-pyramid";
+import {SlidingWindow} from "../../domain/object_detection/sliding-window";
+import {RawPhoto} from "../../domain/photo/raw-photo";
 
 export interface DetectProps {
     firebase: firebase.app.App;
@@ -23,7 +25,8 @@ export interface DetectState {
 
 export default class Detect extends React.Component<DetectProps, DetectState> {
 
-    private preview: HTMLCanvasElement | null = null;
+    private webcamCanvas: HTMLCanvasElement = document.createElement("canvas");
+    private webcamContext: CanvasRenderingContext2D = this.webcamCanvas.getContext("2d") as CanvasRenderingContext2D;
     private matrixCanvas: HTMLCanvasElement | null = null;
     private video: HTMLVideoElement | null = null;
     private model: Model | null = null;
@@ -69,7 +72,7 @@ export default class Detect extends React.Component<DetectProps, DetectState> {
                 window.setInterval(async () => {
                     let imageCapture = new ImageCapture(track);
                     const bitmap = await imageCapture.grabFrame();
-                    this.retrieveImage(bitmap);
+                    this.classify(bitmap);
                 }, 500);
 
             } catch (e) {
@@ -78,45 +81,32 @@ export default class Detect extends React.Component<DetectProps, DetectState> {
         }
     }
 
-    private retrieveImage(img: ImageBitmap): void {
-        if (this.preview != null) {
-            const context = this.preview.getContext("2d");
-            if (context != null) {
+    private classify(img: ImageBitmap): void {
 
-                const portrait: boolean = (img.width < img.height);
+        this.webcamCanvas.width = img.width;
+        this.webcamCanvas.height = img.height;
+        this.webcamContext.drawImage(img, 0, 0);
 
-                const sourceX = (portrait) ? 0 : (img.width - img.height) / 2;
-                const sourceY = (portrait) ? (img.height - img.width) / 2 : 0;
-                const sourceWidth = (portrait) ? img.width : img.height;
-                const sourceHeight = (portrait) ? img.width : img.height;
-                const destWidth = this.preview.width;
-                const destHeight = this.preview.height;
-                const destX = 0;
-                const destY = 0;
+        new ImagePyramid(this.webcamContext).pyramids().forEach((p: ImageData) => {
+            new SlidingWindow(p).window(async (x: number, y: number, window: ImageData) => {
 
+                let photo = new ResizePhoto(
+                    new ContrastPhoto(
+                        new BrightenPhoto(
+                            new RawPhoto(window),
+                            ImageUpload.BRIGHTNESS),
+                        ImageUpload.CONTRAST),
+                    ImageUpload.IMAGE_SIZE_PIXELS,
+                    ImageUpload.IMAGE_SIZE_PIXELS
+                );
 
-                context.drawImage(img, sourceX, sourceY, sourceWidth, sourceHeight, destX, destY, destWidth, destHeight);
-                this.preview.toBlob(async (blob: Blob | null) => {
-                    if (blob != null && this.preview != null) {
-                        let photo = new ResizePhoto(
-                            new ContrastPhoto(
-                                new BrightenPhoto(
-                                    new CroppedPhoto(blob, this.preview.width, this.preview.height),
-                                    ImageUpload.BRIGHTNESS),
-                                ImageUpload.CONTRAST),
-                            ImageUpload.IMAGE_SIZE_PIXELS,
-                            ImageUpload.IMAGE_SIZE_PIXELS
-                        );
+                const imageData = await photo.draw();
+                const matrix = new Transform().toMatrix(new Transform().toObjectList(imageData));
 
-                        const imageData = await photo.draw();
-                        const matrix = new Transform().toMatrix(new Transform().toObjectList(imageData));
-
-                        this.plot(matrix);
-                        this.predictMatrix(matrix);
-                    }
-                });
-            }
-        }
+                this.plot(matrix);
+                this.predictMatrix(matrix);
+            });
+        });
     }
 
     private async plot(matrix: number[][]): Promise<void> {
@@ -151,7 +141,7 @@ export default class Detect extends React.Component<DetectProps, DetectState> {
             const pct = (data[argMax[0]] * 100).toFixed(2);
 
             let predictionText = "Detecting...";
-            if ((data[argMax[0]] * 100) > 60.0) {
+            if ((data[argMax[0]] * 100) > 90.0) {
                 predictionText = this.labels[argMax[0]].label + " (" + pct + " %)";
             }
 
@@ -160,23 +150,6 @@ export default class Detect extends React.Component<DetectProps, DetectState> {
             });
         }
     }
-
-    /* private async predictMatrix() {
-        const tshirtJson = require('./trousers.json');
-        const tshirtMatrix = new Transform().toMatrix(tshirtJson);
-        const tshirtTensor: Tensor3D = tf.tensor3d([tshirtMatrix], [1, 28, 28]);
-
-        console.log("tshirtMatrix = ", tshirtMatrix);
-        console.log("tshirtTensor = ", tshirtTensor);
-
-        const pre = this.model.predict(tshirtTensor);
-        console.log("predict = ", pre.toString());
-
-        // Plot image:
-        let canvasContext = this.preview.getContext("2d");
-        const imageData = await new Plot(tshirtMatrix,100).toCanvasImageData();
-        canvasContext.putImageData(imageData, 0, 0, 0, 0, imageData.width, imageData.height);
-    } */
 
     private downloadStorageFile(url: string, fileName: string, type: string): Promise<File> {
         return new Promise((resolve, reject) => {
@@ -197,7 +170,6 @@ export default class Detect extends React.Component<DetectProps, DetectState> {
     render(): ReactNode {
         return <article>
             <h1>Detect</h1>
-            <canvas id="preview-canvas" ref={(p) => {this.preview = p; }} width="200" height="200" />
             <p>{this.state.prediction}</p>
             <div className="container">
                 <video ref={(v) => {this.video = v; }} autoPlay={true} id="webcam" />

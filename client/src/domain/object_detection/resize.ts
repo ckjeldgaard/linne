@@ -43,13 +43,13 @@ export class Resize {
     }
 
     private interpolateHorizontal(offset: number, x: number, y: number, xMin: number, xMax: number): number {
-        const vMin = this._imageSrc.data[((y * this._imageSrc.width + xMin) * 4) + offset]
+        const vMin = this._imageSrc.data[((y * this._imageSrc.width + xMin) * 4) + offset];
         if (xMin === xMax) {
             return vMin;
         }
 
-        const vMax = this._imageSrc.data[((y * this._imageSrc.width + xMax) * 4) + offset]
-        return this.interpolate(x, xMin, xMax, vMin, vMax)
+        const vMax = this._imageSrc.data[((y * this._imageSrc.width + xMax) * 4) + offset];
+        return this.interpolate(x, xMin, xMax, vMin, vMax);
     }
 
     private interpolate(k: number, kMin: number, kMax: number, vMin: number, vMax: number): number {

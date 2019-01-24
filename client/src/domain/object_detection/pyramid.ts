@@ -1,3 +1,3 @@
 export interface Pyramid {
-    pyramids(): ImageData[]
+    pyramids(): ImageData[];
 }
