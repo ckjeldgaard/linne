@@ -1,3 +1,5 @@
+import {ImageWindow} from "../../model/image-window";
+
 export class SlidingWindow {
 
     constructor(
@@ -5,15 +7,18 @@ export class SlidingWindow {
         private readonly stepSize: number = 32,
         private readonly windowSize: number = 128) {}
 
-    window(callback: (x: number, y: number, data: ImageData) => void): void {
+    windows(): ImageWindow[] {
+
+        const windows: ImageWindow[] = [];
 
         for (let y = 0; y <= (this.image.height - this.windowSize); y += this.stepSize) {
             for (let x = 0; x <= (this.image.width - this.windowSize); x += this.stepSize) {
                 const imageData = this.cropWindow(x, y);
-                callback(x, y, imageData);
+                windows.push({imageData: imageData, x: x, y: y});
             }
         }
 
+        return windows;
     }
 
     private cropWindow(x: number, y: number): ImageData {

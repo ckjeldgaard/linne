@@ -14,6 +14,8 @@ import {Plot} from "../../domain/plot";
 import {ImagePyramid} from "../../domain/object_detection/image-pyramid";
 import {SlidingWindow} from "../../domain/object_detection/sliding-window";
 import {RawPhoto} from "../../domain/photo/raw-photo";
+import {Prediction} from "../../model/prediction";
+import {MatchCandidate} from "../../model/match-candidate";
 
 export interface DetectProps {
     firebase: firebase.app.App;
@@ -25,6 +27,7 @@ export interface DetectState {
 
 export default class Detect extends React.Component<DetectProps, DetectState> {
 
+    private preview: HTMLCanvasElement | null = null;
     private webcamCanvas: HTMLCanvasElement = document.createElement("canvas");
     private webcamContext: CanvasRenderingContext2D = this.webcamCanvas.getContext("2d") as CanvasRenderingContext2D;
     private matrixCanvas: HTMLCanvasElement | null = null;
@@ -52,8 +55,14 @@ export default class Detect extends React.Component<DetectProps, DetectState> {
 
     async componentDidMount(): Promise<void> {
         await this.getModelFiles();
+        if (this.preview != null) {
+            this.canvasContext = this.preview.getContext("2d") as CanvasRenderingContext2D;
+        }
+
         this.accessWebcam();
     }
+
+    private canvasContext: CanvasRenderingContext2D | null = null;
 
     private async accessWebcam(): Promise<void> {
         if (navigator.mediaDevices.getUserMedia && this.video != null) {
@@ -73,7 +82,8 @@ export default class Detect extends React.Component<DetectProps, DetectState> {
                     let imageCapture = new ImageCapture(track);
                     const bitmap = await imageCapture.grabFrame();
                     this.classify(bitmap);
-                }, 500);
+
+               }, 750);
 
             } catch (e) {
                 console.error("Something went wrong when retrieving media stream!", e);
@@ -81,19 +91,30 @@ export default class Detect extends React.Component<DetectProps, DetectState> {
         }
     }
 
-    private classify(img: ImageBitmap): void {
+    private drawOutline(x: number, y: number, w: number = 128, h: number = 128) {
+        if (this.canvasContext != null) {
+            this.canvasContext.clearRect(0, 0, 640, 480);
+            this.canvasContext.lineWidth = 3;
+            this.canvasContext.strokeStyle = "red";
+            this.canvasContext.strokeRect(x, y, w, h);
+        }
+
+    }
+
+    private async classify(img: ImageBitmap): Promise<void> {
 
         this.webcamCanvas.width = img.width;
         this.webcamCanvas.height = img.height;
         this.webcamContext.drawImage(img, 0, 0);
 
-        new ImagePyramid(this.webcamContext).pyramids().forEach((p: ImageData) => {
-            new SlidingWindow(p).window(async (x: number, y: number, window: ImageData) => {
+        const candidates: MatchCandidate[] = [];
 
+        for (const p of new ImagePyramid(this.webcamContext).pyramids()) {
+            for (const window of new SlidingWindow(p).windows()) {
                 let photo = new ResizePhoto(
                     new ContrastPhoto(
                         new BrightenPhoto(
-                            new RawPhoto(window),
+                            new RawPhoto(window.imageData),
                             ImageUpload.BRIGHTNESS),
                         ImageUpload.CONTRAST),
                     ImageUpload.IMAGE_SIZE_PIXELS,
@@ -103,9 +124,51 @@ export default class Detect extends React.Component<DetectProps, DetectState> {
                 const imageData = await photo.draw();
                 const matrix = new Transform().toMatrix(new Transform().toObjectList(imageData));
 
-                this.plot(matrix);
-                this.predictMatrix(matrix);
-            });
+                // this.plot(matrix);
+                const pct = await this.predictMatrix(matrix);
+                // console.log("p.width [" + p.width + "], p.height [" + p.height + "], x = [" + x + "], y = [" + y + "], pct = ", pct);
+                if (pct.pct > 90) {
+                    candidates.push({
+                        windowWidth: p.width,
+                        windowHeight: p.height,
+                        x: window.x,
+                        y: window.y,
+                        pct: pct.pct,
+                        label: pct.labelIndex
+                    });
+                }
+            }
+
+        }
+
+        this.outlineBestMatch(candidates);
+    }
+
+    private outlineBestMatch(candidates: MatchCandidate[]) {
+        console.log("candidates", candidates);
+        console.log("candidates.l", candidates.length);
+        let i = 0;
+        let bestMatch = candidates[i];
+        for (let c of candidates) {
+            if (c.pct > bestMatch.pct) {
+                bestMatch = c;
+            }
+            i++;
+        }
+
+        const f = 640 / bestMatch.windowWidth;
+
+        console.log("bestMatch", bestMatch);
+        this.drawOutline(
+            (bestMatch.x * f),
+            (bestMatch.y * f),
+            (128 * f),
+            (128 * f)
+        );
+
+        const predictionText: string = this.labels[bestMatch.label].label + " (" + bestMatch.pct.toFixed(2) + " %)";
+        this.setState({
+            prediction: predictionText
         });
     }
 
@@ -130,11 +193,26 @@ export default class Detect extends React.Component<DetectProps, DetectState> {
         this.model = await tf.loadModel(tf.io.browserFiles([modelJsonFile, weightsFile]));
     }
 
-    private async predictMatrix(matrix: number[][]): Promise<void> {
-        if (this.model != null) {
-            const tshirtTensor: Tensor3D = tf.tensor3d([matrix], [1, 28, 28]);
+    private async predictMatrix(matrix: number[][]): Promise<Prediction> {
 
-            const prediction: Tensor<Rank> = this.model.predict(tshirtTensor) as Tensor<Rank>;
+        return new Promise(async (resolve, reject) => {
+            if (this.model != null) {
+                const clothingTensor: Tensor3D = tf.tensor3d([matrix], [1, 28, 28]);
+
+                const prediction: Tensor<Rank> = this.model.predict(clothingTensor) as Tensor<Rank>;
+                const data = await prediction.as1D().data();
+                const argMax = await prediction.as1D().argMax().data();
+
+                resolve({labelIndex: argMax[0], pct: (data[argMax[0]] * 100) });
+            } else {
+                reject();
+            }
+        });
+
+        /* if (this.model != null) {
+            const clothingTensor: Tensor3D = tf.tensor3d([matrix], [1, 28, 28]);
+
+            const prediction: Tensor<Rank> = this.model.predict(clothingTensor) as Tensor<Rank>;
             const data = await prediction.as1D().data();
             const argMax = await prediction.as1D().argMax().data();
 
@@ -148,7 +226,7 @@ export default class Detect extends React.Component<DetectProps, DetectState> {
             this.setState({
                 prediction: predictionText
             });
-        }
+        } */
     }
 
     private downloadStorageFile(url: string, fileName: string, type: string): Promise<File> {
@@ -173,6 +251,7 @@ export default class Detect extends React.Component<DetectProps, DetectState> {
             <p>{this.state.prediction}</p>
             <div className="container">
                 <video ref={(v) => {this.video = v; }} autoPlay={true} id="webcam" />
+                <canvas id="preview-canvas" ref={(p) => {this.preview = p; }} width="640" height="480" />
             </div>
             <div className="matrix-canvas-container">
                 <canvas id="matrix-canvas" ref={(p) => {this.matrixCanvas = p; }} width="150" height="150" />

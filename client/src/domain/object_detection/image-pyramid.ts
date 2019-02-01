@@ -11,9 +11,11 @@ export class ImagePyramid implements Pyramid {
     ) {}
 
     pyramids(): ImageData[] {
-        const pyramidImageData: ImageData[] = [];
 
-        const original: Resize = new Resize(this._context.getImageData(0, 0, this._context.canvas.width, this._context.canvas.height));
+        const originalImageData = this._context.getImageData(0, 0, this._context.canvas.width, this._context.canvas.height);
+        const original: Resize = new Resize(originalImageData);
+        const pyramidImageData: ImageData[] = [];
+        pyramidImageData.push(originalImageData);
         let w = this._context.canvas.width;
         let h = this._context.canvas.height;
 
