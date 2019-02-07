@@ -1,11 +1,11 @@
 import * as React from "react";
 import {ReactNode} from "react";
 import {CroppieOptions, ResultOptions} from "croppie";
-// @ts-ignore
-import {Croppie} from "croppie";
 import {Item} from "../../model/item";
 import {ImageUpload} from "../../domain/image-upload";
 import {Photo} from "../../domain/photo/photo";
+// @ts-ignore
+import Croppie = require("croppie");
 
 export interface ImageProcessingProps {
     firebase: firebase.app.App;

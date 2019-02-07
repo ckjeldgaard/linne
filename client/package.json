@@ -43,7 +43,7 @@
     "@types/w3c-image-capture": "^1.0.1",
     "awesome-typescript-loader": "^5.2.1",
     "babel-loader": "^8.0.4",
-    "croppie": "^2.6.2",
+    "croppie": "^2.6.3",
     "css-loader": "^2.0.1",
     "express": "^4.16.4",
     "file-loader": "^2.0.0",

@@ -18,4 +18,7 @@ Diagram "step-by-step":
 * **C:** Whenever executed, a cloud function will fetch all classified images from Firestore.
 * **D:** The function trains a neural network model using TensorFlow.js. The model is defined as a sequential model with three layers. The approach in this step is inspired by [this Keras tutorial](https://www.tensorflow.org/tutorials/keras/basic_classification).
 * **E:** The generated model files a temporarily stored in the Node.js file system and uploaded to Cloud Storage afterwards.
-* **F:** The web frontend opens a webcam video stream, detects objects in each frame using a [sliding window](https://datalya.com/blog/machine-learning/object-detection-with-sliding-window-algorithm) technique, and predicts what kind of clothes are displayed in front of the webcam using the downloaded model files from Cloud Storage.
+* **F:** The web frontend opens a webcam video stream, detects objects in each frame using a [sliding window](https://datalya.com/blog/machine-learning/object-detection-with-sliding-window-algorithm) technique, and predicts what kind of clothes are displayed in front of the webcam using the downloaded model files from Cloud Storage. Again, TensorFlow.js is used on the frontend to do predictions.
+
+## Screenshots
+
