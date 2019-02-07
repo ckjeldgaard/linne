@@ -22,3 +22,4 @@ Diagram "step-by-step":
 
 ## Screenshots
 
+![Screenshots](https://sappy.dk/billeder/tf-screenshots.png)
