@@ -48,7 +48,10 @@ export default class Detect extends React.Component<DetectProps, DetectState> {
     }
 
     async componentDidMount(): Promise<void> {
+        // First, download model files:
         await this.getModelFiles();
+
+        // Then open webcam source and begin prediction:
         this.accessWebcam();
     }
 
@@ -66,6 +69,7 @@ export default class Detect extends React.Component<DetectProps, DetectState> {
 
                 const track = mediaStream.getVideoTracks()[0];
 
+                // Capture an image every half second:
                 window.setInterval(async () => {
                     let imageCapture = new ImageCapture(track);
                     const bitmap = await imageCapture.grabFrame();
@@ -83,6 +87,7 @@ export default class Detect extends React.Component<DetectProps, DetectState> {
             const context = this.preview.getContext("2d");
             if (context != null) {
 
+                // Crop a square image from the center of the webcam source (whether it's in potrait or landscape mode):
                 const portrait: boolean = (img.width < img.height);
 
                 const sourceX = (portrait) ? 0 : (img.width - img.height) / 2;
@@ -97,6 +102,8 @@ export default class Detect extends React.Component<DetectProps, DetectState> {
                 context.drawImage(img, sourceX, sourceY, sourceWidth, sourceHeight, destX, destY, destWidth, destHeight);
                 this.preview.toBlob(async (blob: Blob | null) => {
                     if (blob != null && this.preview != null) {
+
+                        // Process the square image the same way images has been pre-processed before upload and training:
                         let photo = new ResizePhoto(
                             new ContrastPhoto(
                                 new BrightenPhoto(
@@ -118,6 +125,10 @@ export default class Detect extends React.Component<DetectProps, DetectState> {
         }
     }
 
+    /**
+     * Plots a greyscale and processed square image to a <canvas> element at the bottom of the page.
+     * @param matrix Expects a 2-dimensional array (i.e. matrix) of size 28x28.
+     */
     private async plot(matrix: number[][]): Promise<void> {
         if (this.matrixCanvas != null) {
             const context = this.matrixCanvas.getContext("2d");
@@ -128,6 +139,9 @@ export default class Detect extends React.Component<DetectProps, DetectState> {
         }
     }
 
+    /**
+     * Fetches the model.json and weights.bin TensorFlow.js files from Firebase storage.
+     */
     private async getModelFiles(): Promise<void> {
         const storage: firebase.storage.Storage = this.props.firebase.storage();
         const modelUrl = await storage.ref("model.json").getDownloadURL();
@@ -139,11 +153,16 @@ export default class Detect extends React.Component<DetectProps, DetectState> {
         this.model = await tf.loadModel(tf.io.browserFiles([modelJsonFile, weightsFile]));
     }
 
+    /**
+     * Using the downloaded model to predict what object in currently in the webcam source using TensorFlow.js.
+     * Prints the best guess label above the webcam.
+     * @param matrix Expects a 2-dimensional array (i.e. matrix) of size 28x28.
+     */
     private async predictMatrix(matrix: number[][]): Promise<void> {
         if (this.model != null) {
-            const tshirtTensor: Tensor3D = tf.tensor3d([matrix], [1, 28, 28]);
+            const tensor: Tensor3D = tf.tensor3d([matrix], [1, 28, 28]);
 
-            const prediction: Tensor<Rank> = this.model.predict(tshirtTensor) as Tensor<Rank>;
+            const prediction: Tensor<Rank> = this.model.predict(tensor) as Tensor<Rank>;
             const data = await prediction.as1D().data();
             const argMax = await prediction.as1D().argMax().data();
 
@@ -160,6 +179,9 @@ export default class Detect extends React.Component<DetectProps, DetectState> {
         }
     }
 
+    /**
+     * Helper function to download an external file from Firebase Storage.
+     */
     private downloadStorageFile(url: string, fileName: string, type: string): Promise<File> {
         return new Promise((resolve, reject) => {
             const xhr = new XMLHttpRequest();

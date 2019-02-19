@@ -76,8 +76,7 @@ export default class ImageProcessing extends React.Component<ImageProcessingProp
     private processImage(event: React.FormEvent<HTMLButtonElement>): void {
         if (this.cropper != null) {
 
-            type blobOptions = ResultOptions & { type: "blob" };
-            let options: blobOptions = {
+            let options: ResultOptions & { type: "blob" } = {
                 type: "blob",
                 format: "jpeg",
                 circle: false
