@@ -75,11 +75,14 @@ export default class ImageProcessing extends React.Component<ImageProcessingProp
 
     private processImage(event: React.FormEvent<HTMLButtonElement>): void {
         if (this.cropper != null) {
-            let options: ResultOptions = {
-                format: "jpeg",
+
+            type blobOptions = ResultOptions & { type: "blob" };
+            let options: blobOptions = {
                 type: "blob",
+                format: "jpeg",
                 circle: false
             };
+
             this.cropper.result(options).then(async (blob: Blob) => {
                 console.log("Got a blob", blob);
                 if (this.state.chosenItem != null) {
@@ -105,24 +108,24 @@ export default class ImageProcessing extends React.Component<ImageProcessingProp
         return <div className="image-processing">
             <div className={this.state.loading ? "loader" : "loader hidden"} />
             <div className={this.state.loading ? "content dim" : "content"}>
-            <p>Crop and classify image</p>
-            <div>
-                <img ref={(p) => {this._previewField = p; }} alt="Preview" />
-            </div>
-            <div className="controls">
-                <div className="classify">
-                    <label htmlFor="item">Item:
-                        <select id="item" onChange={e => this.selectItem(e)}>
-                            <option>-- Select --</option>{
+                <p>Crop and classify image</p>
+                <div>
+                    <img ref={(p) => {this._previewField = p; }} alt="Preview" />
+                </div>
+                <div className="controls">
+                    <div className="classify">
+                        <label htmlFor="item">Item:
+                            <select id="item" onChange={e => this.selectItem(e)}>
+                                <option>-- Select --</option>{
                                 this.props.itemOptions.map((item) => {
                                     return <option key={item.id} value={item.id}>{item.label}</option>;
                                 })
                             }
-                        </select>
-                    </label>
+                            </select>
+                        </label>
+                    </div>
+                    <button className="btn--raised" disabled={this.state.uploadDisabled} onClick={e => this.processImage(e)}>Upload</button>
                 </div>
-                <button className="btn--raised" disabled={this.state.uploadDisabled} onClick={e => this.processImage(e)}>Upload</button>
-            </div>
             </div>
         </div>;
     }
