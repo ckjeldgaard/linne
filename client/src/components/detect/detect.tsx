@@ -93,8 +93,7 @@ export default class Detect extends React.Component<DetectProps, DetectState> {
                 const destHeight = this.preview.height;
                 const destX = 0;
                 const destY = 0;
-
-
+                
                 context.drawImage(img, sourceX, sourceY, sourceWidth, sourceHeight, destX, destY, destWidth, destHeight);
                 this.preview.toBlob(async (blob: Blob | null) => {
                     if (blob != null && this.preview != null) {
@@ -160,23 +159,6 @@ export default class Detect extends React.Component<DetectProps, DetectState> {
             });
         }
     }
-
-    /* private async predictMatrix() {
-        const tshirtJson = require('./trousers.json');
-        const tshirtMatrix = new Transform().toMatrix(tshirtJson);
-        const tshirtTensor: Tensor3D = tf.tensor3d([tshirtMatrix], [1, 28, 28]);
-
-        console.log("tshirtMatrix = ", tshirtMatrix);
-        console.log("tshirtTensor = ", tshirtTensor);
-
-        const pre = this.model.predict(tshirtTensor);
-        console.log("predict = ", pre.toString());
-
-        // Plot image:
-        let canvasContext = this.preview.getContext("2d");
-        const imageData = await new Plot(tshirtMatrix,100).toCanvasImageData();
-        canvasContext.putImageData(imageData, 0, 0, 0, 0, imageData.width, imageData.height);
-    } */
 
     private downloadStorageFile(url: string, fileName: string, type: string): Promise<File> {
         return new Promise((resolve, reject) => {
