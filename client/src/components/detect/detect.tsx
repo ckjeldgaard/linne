@@ -93,7 +93,7 @@ export default class Detect extends React.Component<DetectProps, DetectState> {
                 const destHeight = this.preview.height;
                 const destX = 0;
                 const destY = 0;
-                
+
                 context.drawImage(img, sourceX, sourceY, sourceWidth, sourceHeight, destX, destY, destWidth, destHeight);
                 this.preview.toBlob(async (blob: Blob | null) => {
                     if (blob != null && this.preview != null) {
