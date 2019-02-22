@@ -18,7 +18,7 @@ export class ImageUpload {
     private readonly firebaseApp: firebase.app.App;
 
     public static readonly BRIGHTNESS: number = 50;
-    public static readonly CONTRAST: number = 10;
+    public static readonly CONTRAST: number = 90;
     public static readonly IMAGE_SIZE_PIXELS: number = 28;
 
     constructor(firebase: firebase.app.App) {
