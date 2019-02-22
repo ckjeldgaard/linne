@@ -79,7 +79,7 @@ const uploadModelFiles = async function(): Promise<boolean> {
     return true;
 };
 
-// Training with TensorFlow.js required a lot of resources. Increasing memory here:
+// Training with TensorFlow.js requires a lot of resources. Increasing memory here:
 const runtimeOpts = {
     timeoutSeconds: 540,
     memory: "2GB"
